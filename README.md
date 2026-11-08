@@ -1,4 +1,4 @@
-# vim-dir
+# vim-ide
 
 
 
