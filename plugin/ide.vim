@@ -254,7 +254,8 @@ function! s:MyDir(...)
 
     " Create Window/Buffer Part
     " 8 Args
-        call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')", "x :call g:MyDirAction('e')", "n :call g:MyDirAction('n')", "p :call g:MyDirAction('p')", "v :call g:MyDirAction('v')","q :call g:MyDirAction('q')")
+        "call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')", "x :call g:MyDirAction('e')", "n :call g:MyDirAction('n')", "p :call g:MyDirAction('p')", "v :call g:MyDirAction('v')","q :call g:MyDirAction('q')")
+        call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')")
         echom "<r> edit snip, <enter> read snip into current buffer, <l> load session file, <p> open and load project"
         let w:window_name = 'dir'
 
@@ -421,7 +422,6 @@ function! s:RemoveFirstToken(str)
 endfunction
 
 
-
 function! g:MyDirAction(...)
      let l:sz   = s:RemoveFirstToken(getline("."))
      echom l:sz
@@ -435,157 +435,14 @@ function! g:MyDirAction(...)
              endif
              let l:fs = s:DirSet . "/" . l:sz
              if ( isdirectory(s:DirSet . "/" . l:sz) == 0 )
-                 " echom l:fs . "   "  .  filereadable(l:fs)
-                 "if (filereadable(l:fs))
-                 if (1==1)
-                     if (a:1 == 'n')
-                                "silent execute "q"
-                                "silent execute a:1 . " " . l:fs
-                                exe s:DirEditWindow+1 . "wincmd w"
-                                execute "enew"
-                                execute "r " . l:fs
-                                normal! k
-                     endif
-                     if (a:1 == 'p')
-                                exe  "cd /etc/air/scm/" . s:FileNameMiddlePart(l:sz) 
-                                exe  "pwd"
-                                silent execute "q"
-                                "call DIRPWD(s:KEEPSPLITOPEN)
-                                let l:sz = "/etc/air/scm/" . s:FileNameMiddlePart(l:sz)  . "/.vim.vimsession"
-                                if (filereadable(l:sz))
-                                   silent execute "bufdo! bd"
-                                   execute "call LoadSession()"
-                                   else
-                                       echom "No session file (.vim.vimsession)"
-                                endif
-                     endif
-                     if (a:1 == 'l')
-                                if ( s:FileNameIs(l:sz, ".vim.vimsession") )
-                                    silent execute "q"
-                                    silent execute "bufdo! bd"
-                                    execute "call LoadSession()"
-                                else
-                                        echom "Not a session file"
-                                endif
-                     endif
-
                      " **************************
                      " This is the <enter> action
                      " **************************
-                     if (a:1 == 'rx')
-                                        call g:JumpToWindowByName('client')
-                                        "exe "wincmd w"
-                                        execute "e " . l:fs
-                                        normal! k
-                                        " **************************
-                                        " New Code
-                                        " **************************
-                                        "exe s:DirEditWindow . "wincmd w"
-                                        "silent execute "q"
-                                        " End **********************
-                     endif
                      if (a:1 == 'r')
-                                if (s:FileNameBookEnds(l:sz, "A", "vim") == 0)
-                                    if (s:FileNameBookEnds(l:sz, "A", "project") == 0)
-                                        exe s:DirEditWindow+1 . "wincmd w"
-                                        execute "r " . l:fs
-                                        normal! k
-                                        " **************************
-                                        " New Code
-                                        " **************************
-                                        exe s:DirEditWindow . "wincmd w"
-                                        silent execute "q"
-                                        " End **********************
-
-                                    endif
-                                endif
+                         call g:JumpToWindowByName('client')
+                         execute "e " . l:fs
+                         normal! k
                      endif
-                     if (a:1 == 'v')
-                                if (s:FileNameBookEnds(l:sz, "A", "vim") == 1)
-                                    exe s:DirEditWindow+1 . "wincmd w"
-                                    execute "e " . "/etc/air/scm/vim-progsnips/plugin/" . l:sz 
-                                endif
-                     endif
-                     if (a:1 == 'q')
-                                if (s:FileNameBookEnds(l:sz, "A", "vim") == 1)
-                                    exe s:DirEditWindow+1 . "wincmd w"
-                                    exe "!cd /etc/air/scm/vim-progsnips; A.add " . s:FileNameMiddlePart(l:sz) . ";"
-                                endif
-                     endif
-                     if (a:1 == 'e')
-                                if (s:FileNameBookEnds(l:sz, "A", "vim") == 1)
-                                    if (g:IsTextish(l:fs,"THISTEXT") == 1)
-                                        call g:Textish(l:fs,"THISTEXT")
-                                    else
-                                        exe s:DirEditWindow+1 . "wincmd w"
-                                        let l:thisCurrentLine = line(".")
-                                        exe  "call g:" . s:FileNameMiddlePart(l:sz) . "()"
-                                        silent execute "" . l:thisCurrentLine
-    "                                   normal! k
-    "                                   exe s:DirEditWindow . "wincmd w"
-    "                                   silent execute "q"
-                                    endif
-                                else
-                                    if (s:FileNameBookEnds(l:sz, "B", "txt") == 1)
-                                        call g:Textish(l:fs,"THISTEXT")
-                                    else
-                                        if (s:FileNameBookEnds(l:sz, "A", "project") == 1)
-                                            " let l:ninnnn = input("DEBUG2>> [" . "STOP" . "][" . s:FileNameMiddlePart(l:sz) . "]")
-                                            exe  "cd /etc/air/scm/" . s:FileNameMiddlePart(l:sz) 
-                                            exe  "pwd"
-                                            silent execute "q"
-                                            call DIRPWD(s:KEEPSPLITOPEN)
-                                        else
-                                            if (s:FileNameBookEnds(l:sz, "A", "txt") == 1)
-                                                let s:body = []
-                                                if (filereadable(l:fs))
-                                                    let s:body = readfile(l:fs)
-                                                    if ( s:body[0] == "THISTEXT")
-                                                        let i = remove(s:body, 0)
-                                                        exe s:DirEditWindow+1 . "wincmd w"
-                                                        for s:item in s:body
-                                                            exe "set paste"
-                                                            exe "normal! o" . "" . s:item . "" . "\<Esc>"
-                                                            exe "set nopaste"
-                                                        endfor
-                                                        exe "normal! o" . "" . "" . "" . "\<Esc>"
-                                                    endif
-                                                endif
-                                            else
-                                                if (s:DirFileNameExtension(l:sz) == "txt")
-                                                        exe s:DirEditWindow+1 . "wincmd w"
-                                                        execute "e " . l:fs
-                                                        normal! k
-                                                        exe s:DirEditWindow . "wincmd w"
-                                                else
-                                                        "silent execute "q"
-                                                        "silent execute a:1 . " " . l:fs
-                                                        exe s:DirEditWindow+1 . "wincmd w"
-                                                        execute "e " . l:fs
-                                                        normal! k
-                                                        exe s:DirEditWindow . "wincmd w"
-                                                endif 
-                                            endif 
-                                        endif 
-                                    endif 
-                                endif 
-
-                     endif 
-if (0 > 1) 
-
-                             if (s:DirCloseWindow == 1)
-                                 silent execute "q"
-                             endif
-                             exe s:DirEditWindow+1 . "wincmd w"
-                             silent execute a:1 . " " . l:fs
-                             if (s:DirCloseWindow == 0)
-                                 exe s:DirWindow . "wincmd w"
-                             endif
-endif
-
-
-
-                 endif
              else
                  silent execute "q"
                  call s:DirSetInto(l:sz)
