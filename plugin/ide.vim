@@ -59,42 +59,6 @@ function! g:Switcher()
 endfunction
 
 
-function! g:XXxxSwitcher()
-    if (g:AnyWindowsExist('menu','dir'))
-        if (g:menumode  == 1) 
-            call g:JumpToWindowByName('menu')
-            close
-            call s:MyDirPwd(0)
-            let g:menumode=0
-            
-            " Use all lines in the buffer
-            let s:max_width = max(map(getline(1, '$'), 'strdisplaywidth(v:val)'))
-            execute 'vertical resize ' . (s:max_width + 2)
-
-            " Alternative: Use only visible lines in the buffer
-            " let s:visible_lines = getline(line('w0'), line('w$'))
-            " let s:max_width = empty(s:visible_lines) ? 0 : max(map(s:visible_lines, 'strdisplaywidth(v:val)'))
-            " execute 'vertical resize ' . (s:max_width + 2)
-        else
-            call g:JumpToWindowByName('dir')
-            close
-            call  s:vde()
-            let g:menumode=1
-            call g:JumpToWindowByName('menu')
-            
-            " Use all lines in the buffer
-            "let s:max_width = max(map(getline(1, '$'), 'strdisplaywidth(v:val)'))
-            "execute 'vertical resize ' . (s:max_width + 2)
-
-            " Alternative: Use only visible lines in the buffer
-            " let s:visible_lines = getline(line('w0'), line('w$'))
-            " let s:max_width = empty(s:visible_lines) ? 0 : max(map(s:visible_lines, 'strdisplaywidth(v:val)'))
-            " execute 'vertical resize ' . (s:max_width + 2)
-        endif
-    endif
-endfunction
-
-"nnoremap <Tab> <C-w>w
 nnoremap <Tab> :call g:Switcher()<cr>
 nnoremap <leader>d :call g:SwitcherDir()<cr>
 
@@ -114,8 +78,6 @@ let s:OPENFILEACTION = 1
 let s:CLOSESPLITAFTERACTION = 0
 let s:OPENSPLITAFTERACTION = 1
 let s:KEEPSPLITOPEN = 0
-" ============================================================================
-
 
 
 " *****************************************************************************************************
@@ -142,12 +104,8 @@ function! s:DirSetMask(...)
 endfunction
 
 " https://vim.fandom.com/wiki/Get_the_name_of_the_current_file
-
-
 function! s:PathFileName(...)                  " Given a full filename path, return the filename part
     return fnamemodify(a:1, ':t')
-    remap <Leader>k :call g:DIRSELECTOPEN($HOME . "/projects/*.project")<cr>
-
 endfunction
 function! s:PathLastDirectory(...)             " Given a full filename path, return the last directoryi name only
     return fnamemodify(a:1, ':p:h:t')
@@ -155,14 +113,12 @@ endfunction
 function! s:PathFullDirectory(...)             " Given a full filename path, return thei path to the filename
     return fnamemodify(a:1, ':p:h')
 endfunction
-
 function! s:FileNameExtension(...)
     return split(a:1,"[.]")[-1]
 endfunction
 function! s:DirFileNameExtension(...)
     return split(a:1,"[.]")[-1]
 endfunction
-
 function! s:FileNameFirstPart(...)
     return split(a:1,"[.]")[0]
 endfunction
@@ -230,9 +186,6 @@ function! s:PutLine(...)
 endfunction
 
 
-"    :call HighlightLineWithStr('ColorRed', 'TODO', 'first')
-" --------------------------------------------------------------------------
-
 function! s:MyDir(...)
         let l:CommandType = a:1
         call s:PutLineSet(0)
@@ -264,6 +217,8 @@ function! s:MyDir(...)
         call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')")
         echom "<r> edit snip, <enter> read snip into current buffer, <l> load session file, <p> open and load project"
         let w:window_name = 'dir'
+        setlocal wincolor=MyCustomBg
+        setlocal nonumber norelativenumber
 
         let s:DirWindow = winnr()
         nnoremap <silent> <buffer> i <Nop>
@@ -350,9 +305,6 @@ function! s:MyDirPwd(...)
 endfunction
 
 
-
-
-
 function! s:DirSetSpecific(...)
     let s:DirSet = a:1
     return s:DirSet
@@ -387,36 +339,6 @@ function! g:MyBufferAction()
               exe "q"
               execute "b " . l:ret
           endif
-endfunction
-
-"if !empty(glob("path/to/file"))
-function! g:IsTextish(...)
-    let l:ret = 0
-    let l:body = []
-    if (filereadable(a:1))
-        let l:body = readfile(a:1)
-        if ( l:body[0] == a:2)
-            let l:ret = 1
-        endif
-    endif
-    let l:body = []
-    return l:ret
-endfunction
-function! g:Textish(...)
-    let l:body = []
-    if (filereadable(a:1))
-        let l:body = readfile(a:1)
-        if ( l:body[0] == a:2)
-            let l:temp = remove(l:body, 0)
-            exe s:DirEditWindow+1 . "wincmd w"
-            for l:item in l:body
-                exe "set paste"
-                exe "normal! o" . l:item . "\<Esc>"
-                exe "set nopaste"
-            endfor
-            exe "normal! o" . "\<Esc>"
-        endif
-    endif
 endfunction
 
 function! s:RemoveFirstToken(str)
@@ -594,12 +516,6 @@ function! g:DIRCPF()
     call s:MyProject()
 endfunction
 
-
-"augroup BufferSwitchEvents
-"    autocmd!
-"    call g:Log(expand('%:t'))
-"    autocmd BufEnter * call BufferEntry(expand('%:t'))
-"augroup END
 
 function! BufferEntry(...)
     call win_gotoid(s:menu_win)
