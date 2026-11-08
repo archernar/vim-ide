@@ -21,13 +21,19 @@ endif
 let g:menumode=1
 
 function! g:SwitcherDir()
+    if (g:WindowsExist('menu','client'))
+        call g:JumpToWindowByName('menu')
+        close
+        call s:MyDirPwd(0)
+        " Use all lines in the buffer
+        let s:max_width = max(map(getline(1, '$'), 'strdisplaywidth(v:val)'))
+        execute 'vertical resize ' . (s:max_width + 2)
+    elseif (g:WindowsExist('dir','client'))
+        call g:JumpToWindowByName('dir')
+        close
+            call  s:vde()
             call g:JumpToWindowByName('menu')
-            close
-            call s:MyDirPwd(0)
-            
-            " Use all lines in the buffer
-            let s:max_width = max(map(getline(1, '$'), 'strdisplaywidth(v:val)'))
-            execute 'vertical resize ' . (s:max_width + 2)
+    endif
 endfunction
 
 function! g:Switcher()
