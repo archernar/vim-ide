@@ -1,0 +1,43 @@
+#!/usr/bin/ksh
+Tmp="/tmp/$$"
+TmpDir="/tmp/dir$$"
+trap 'rm -f "$Tmp" >/dev/null 2>&1' 0
+trap "exit 2" 1 2 3 13 15
+rm $Tmp  >/dev/null 2>&1
+
+
+rm ./tags   >/dev/null 2>&1
+ctags ./plugin/dir.vim
+
+cat tags | grep function | gawk '
+function ltrim(s) { sub(/^ */, "", s); return s }
+function rtrim(s) { sub(/ *$/, "", s); return s }
+function trim(s)  { return rtrim(ltrim(s)); }
+BEGIN {
+        print trim("")  > "functions.top"
+        print trim("")                           >> "functions.top"
+        print trim("| function | description |") >> "functions.top"
+        print trim("| -------- | ----------- |") >> "functions.top"
+        close("functions.top")
+
+}
+{
+        $1=""
+        $2=""
+        sz = $0
+        sub(/f$/, "", sz)
+        sz = trim(sz)
+        sub(/^.*[!] /, "", sz)
+        sub(/[$].*$/, "", sz)
+        sub(/[)]/, ") | ", sz)
+        sz = trim(sz)
+        print "| "  sz   " |"
+
+}
+' > $Tmp
+cp $Tmp zed
+cat functions.top          > functions.txt
+egrep    "g:" $Tmp | sort >> functions.txt
+egrep -v "g:" $Tmp | sort >> functions.txt
+
+
