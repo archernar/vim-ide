@@ -189,7 +189,7 @@ endfunction
 function! s:MyDir(...)
         let l:CommandType = a:1
         call s:PutLineSet(0)
-    " Load Directory Part
+        " Load Directory Part
         let l:forcetype = "f"
         if (a:0 == 2)
             let l:list = split(glob(a:2),'\n')
@@ -211,8 +211,8 @@ function! s:MyDir(...)
             endif
         endif
 
-    " Create Window/Buffer Part
-    " 8 Args
+        " Create Window/Buffer Part
+        " 8 Args
         "call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')", "x :call g:MyDirAction('e')", "n :call g:MyDirAction('n')", "p :call g:MyDirAction('p')", "v :call g:MyDirAction('v')","q :call g:MyDirAction('q')")
         call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')")
         echom "<r> edit snip, <enter> read snip into current buffer, <l> load session file, <p> open and load project"
@@ -272,7 +272,6 @@ endfunc
 function! s:AssertExecution(...)
     silent execute a:1
 endfunc
-
 
 
 " *****************************************************************************************************
@@ -478,8 +477,6 @@ function! HighlightLineWithStr(hl_group, search_str, ...)
 endfunction
 
 
-
-
 " SECVDE SECVDI
 " *****************************************************************************************************
                 "  Vim Development Environment
@@ -575,27 +572,20 @@ function! s:MyProject(...)
 
         call StoreClear(s:nv_cache2)
 
-exe "wincmd w"
-execute "e " .  $HOME . "/" . "LUCIEN"
-call g:CloseBuffersExceptLucien() 
-exe "wincmd w"
+        exe "wincmd w"
+        execute "e " .  $HOME . "/" . "LUCIEN"
+        call g:CloseBuffersExceptLucien() 
+        exe "wincmd w"
 
-" Create an empty dictionary to store bufnr as key and filename as value
-let l:buffer_dict = {}
+        " Create an empty dictionary to store bufnr as key and filename as value
+        let l:buffer_dict = {}
 
-" Iterate through all listed buffers
-for l:buf in getbufinfo({'buflisted': 1})
-    if !empty(l:buf.name)
-       let l:buffer_dict[l:buf.name] = l:buf.bufnr
-   endif
-endfor
-
-
-
-" Example: Print the resulting dictionary
-" call g:ShowPopupDict(l:buffer_dict, 3000)
-"echo l:buffer_dict
-
+        " Iterate through all listed buffers
+        for l:buf in getbufinfo({'buflisted': 1})
+            if !empty(l:buf.name)
+               let l:buffer_dict[l:buf.name] = l:buf.bufnr
+           endif
+        endfor
 
         for key in l:list
               call s:PutLine(key)
@@ -621,18 +611,16 @@ endfor
         let s:cmdViewLog="View-Log"
 
         set nowrap
-let g:BoxHoriz      = '─'
-let g:BoxVert       = '│'
-let g:BoxTopRight   = '┐'
-let g:BoxTopLeft    = '┌'
+        let g:BoxHoriz      = '─'
+        let g:BoxVert       = '│'
+        let g:BoxTopRight   = '┐'
+        let g:BoxTopLeft    = '┌'
 
-let g:BoxBotLeft    = '└'
-let g:BoxBotRight   = '┘'
+        let g:BoxBotLeft    = '└'
+        let g:BoxBotRight   = '┘'
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
-
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
-
         call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog)
         call s:PutInLineHeader('ColorMagenta', "Projects")
 
@@ -652,12 +640,6 @@ let g:BoxBotRight   = '┘'
                 exe "wincmd w"
             endif
         endif
-        if ( 1==0 )
-            exe "botright terminal"
-            let w:window_name = 'term'
-            exe "resize 4"
-            call g:JumpToWindowByName('client')
-        endif
 
         set nowrap
 
@@ -670,7 +652,57 @@ function! g:MySelectionAction(...)
      " **************************
      " This is the <enter> action
      " **************************
-     call g:Log(l:sz)
+     if (a:1 == 'rx')
+         if (l:sz == s:cmdCommitAll)
+             echom l:sz
+             execute "!git commit -a -m \"Commit-All\""
+         elseif (l:sz == s:cmdPush)
+             echom l:sz
+             execute "!git push origin master"
+         elseif (l:sz == s:cmdCommitPush)
+             echom l:sz
+             call g:SystemCommand("!git commit -a -m \"Commit-All\"")
+             call g:SystemCommand("!git push origin master")
+         elseif (l:sz == s:cmdCommitBuffer)
+             call g:JumpToWindowByName('client')
+             let l:fn=expand('%')
+             execute "!git add" . " " . l:fn
+             execute "!git commit -m \"Update\"" . " " . l:fn
+             call g:JumpToWindowByName('menu')
+         elseif (l:sz == s:cmdViewLog)
+             call g:JumpToWindowByName('client')
+             execute "e " . expand('~/.vim/debug.log')
+             normal! k
+         elseif (l:sz == s:cmdSetComment)
+             let s:comment = readfile($HOME . "/comments")[0]
+             let s:comment = PromptPopupInput("New comment:", s:comment)
+             redraw!
+         elseif (g:StartsWith("Browse-", l:sz))
+             let s:BrowseMode = s:BrowseMode ? 0 : 1
+             call setline('.', s:BrowseMode ? s:cmdBrowseMode : s:cmdBrowseModeOff)
+         elseif (g:StartsWith("PRJ ", l:sz))
+             call ShowPopupMessage('cd ' .  StoreGet(s:nv_cache1, l:sz), 1000)
+             execute 'cd ' .  StoreGet(s:nv_cache1, l:sz)
+             execute 'q'
+             call s:vde()
+          else
+             call HighlightLineWithStr('ColorGreen', l:sz)
+             call g:JumpToLineWithStr(l:sz)
+             call g:JumpToWindowByName('client')
+             execute "e " .  s:DirSet . "/" . l:sz
+             if (s:BrowseMode == 1)
+                 call g:JumpToWindowByName('menu')
+             endif
+         endif
+     endif
+endfunction
+function! g:XXXXXMySelectionAction(...)
+     echom ""
+     let l:sz   = s:DirToken(getline("."))
+     let l:sz   = getline(".")
+     " **************************
+     " This is the <enter> action
+     " **************************
      if (a:1 == 'rx')
          if (l:sz == s:cmdCommitAll)
              echom l:sz
@@ -739,4 +771,5 @@ function! g:MySelectionAction(...)
              endif
          endif
      endif
+     echom ""
 endfunction
