@@ -116,25 +116,8 @@ let s:KEEPSPLITOPEN = 0
                 "  Command definitions
                 " *************************************************************************************
 command! UPDATEVIMIDE  :PluginUpdate vim-ide
-command! CODE          :call s:MyDirCode(0)
-command! SNIPS         :call s:MyDirSnips(0)
-command! DIRE          :call s:MyDirSelect($VIMSELECTEDDIR,0)
-command! PROJ          :call s:MyDirProjectSnips(0)
-command! J             :call s:MyDirJSnips(0)
-command! A             :call s:MyDirAllSnips(0)
-command! JN            :call s:NewSnip()
-command! FRESH         :call g:FreshSnip()
-command! FRESHTHIS     :call g:BuffertoSnip()
-command! QRS           :call g:CourseSnip()
-command! COURSE        :call g:CourseSnip()
-command! PUSHSNIPS     :! cd /etc/air/scm/vim-progsnips;git add plugin/*.txt;git commit -m "Update";git push -u origin master
-
-command! JSNIPS        :call s:MyDirJSnips(0)
-command! CLASSES       :call s:MyDirClasses(0)
-command! B             :call s:MyVimBuffers(1)
 command! DIR           :call s:MyDirPwd(1)
 command! DIRC          :call s:MyDirPwd(0)
-command! DDIR          :call s:MyDirPwd(0)
 command! IDE           :call s:vde()
 command! VDE           :call s:vde()
 
@@ -244,104 +227,6 @@ endfunction
 "    :call HighlightLineWithStr('ColorRed', 'TODO', 'first')
 " --------------------------------------------------------------------------
 
-
-function! g:CourseSnip()
-    let l:tag = "QRS"
-    let l:repo = "/etc/air/scm/vim-progsnips"
-    let l:dir = l:repo . "/plugin"
-    let l:fname=expand('%:r')
-    call g:Strreplace(l:fname,l:tag . "-","")
-    call g:Strreplace(l:fname,l:tag . "-","")
-    call g:Strreplace(l:fname,l:tag . "-","")
-
-    if (isdirectory(l:dir))
-        let l:name = l:tag
-        let l:name = toupper(l:name) . "-" . toupper(l:fname)  . ".txt"
-        execute "w! " . l:dir . "/" .l:name
-        let l:cmd = "!cd " . l:repo . ";git add plugin/*.txt;git commit -m 'Update';git push -u origin master"
-        execute l:cmd
-       " execute "cd " . l:repo . ";git add plugin/*.txt;git commit -m 'Update';git push -u origin master"
-    else
-        echom l:dir . " directory does not exist"
-    endif
-endfunction
-function! g:BuffertoSnip()
-    let l:dir = "/etc/air/scm/vim-progsnips/plugin"
-    let l:fname=expand('%:r')
-    if (isdirectory(l:dir))
-        let l:name = input('Enter snip prefix name: ')
-        let l:name = toupper(l:name) . "-" . toupper(l:fname)  . ".txt"
-        execute "w " . l:dir . "/" .l:name
-    else
-        echom l:dir . " directory does not exist"
-    endif
-endfunction
-function! g:FreshSnip()
-    let l:dir = "/etc/air/scm/vim-progsnips/plugin"
-    if (isdirectory(l:dir))
-        let l:name = input('Enter snip file name: ')
-        let l:name = toupper(l:name) . ".txt"
-        execute "e " . l:dir . "/" .l:name
-    else
-        echom l:dir . " directory does not exist"
-    endif
-endfunction
-
-function! s:NewSnip()
-    let l:name = input('Enter file name: ')
-    let l:name = "J" . l:name
-    let l:name = toupper(l:name) . ".txt"
-    let  l:dir="/etc/mdisks/scm/vim-progsnips/plugin/"
-    execute "e " . l:dir . l:name
-endfunction
-
-function! g:VIMBUFFERS(...)
-    call s:MyVimBuffers(a:1)
-endfunction
-
-function! s:MyVimBuffers(...)
-    call s:PutLineSet(0)
-    " Load Buffer Part
-        let l:list = []
-        let l:forcetype = "b"
-                let l:c=1
-                while l:c <= 64 
-                    if (bufexists(l:c))
-                        if (filereadable(bufname(l:c)))
-                            if (getbufvar(l:c, '&buftype') == "")
-                                if !(bufname(l:c) == "")
-                                   call add(list, l:c . " " . bufname(l:c) ) 
-                                endif
-                            endif
-                        endif
-                    endif
-                    let l:c += 1
-                endwhile 
-    " Create Window/Buffer Part
-        call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyBufferAction()","s :call g:MyBufferAction()", "b :call g:MyBufferAction()")
-        let s:DirWindow = winnr()
-        nnoremap <silent> <buffer> f /^f<cr>
-        echom "<enter> to select"
-    " Display Part
-        setlocal cursorline
-        call s:PutLineSet(1)
-
-        call s:PutLine("Vim Buffers")
-        let l:templ = []
-
-	for key in l:list
-          let l:type=l:forcetype
-          "call add(l:templ, l:type . " " . key)
-          call s:PutLine(l:type . " " . key)
-	endfor
-
-	"for key in sort(l:templ)
-        "  call s:PutLine(key)
-	"endfor
-
-        set nowrap
-endfunc
-
 function! s:MyDir(...)
         let l:CommandType = a:1
         call s:PutLineSet(0)
@@ -431,23 +316,6 @@ endfunc
 " *****************************************************************************************************
                 "  Global/Public Functions
                 " *************************************************************************************
-function! g:ListBuffers()
-    let l:c=1
-    call g:NewWindow("Left", &columns/4)
-    call s:PutLine(1)
-    while l:c <= 64 
-        if (bufexists(l:c))
-            if (filereadable(bufname(l:c)))
-                if (getbufvar(l:c, '&buftype') == "")
-                    if !(bufname(l:c) == "")
-                       call s:PutLine( l:c . " " . bufname(l:c) ) 
-                    endif
-                endif
-            endif
-        endif
-        let l:c += 1
-    endwhile 
-endfunction
 function! s:MyDirSelect(...)
     let  s:DirCloseWindow = a:2
     let  s:DirEditWindow = winnr()
@@ -482,30 +350,6 @@ function! s:DirSetSpecific(...)
     let s:DirSet = a:1
     return s:DirSet
 endfunction
-function! s:MyDirCode(...)
-    let  s:DirCloseWindow = a:1
-    let  s:DirEditWindow = winnr()
-    call s:DirSetSpecific("/etc/air/CC") 
-    call s:MyDir(0, "/etc/air/CC" . s:DirMask)
-endfunction
-function! s:MyDirSnips(...)
-    let  s:DirCloseWindow = a:1
-    let  s:DirEditWindow = winnr()
-    let  l:dir="/.vim/bundle/vim-progsnips/plugin" 
-    call s:DirSetSpecific($HOME . l:dir) 
-    call s:MyDir(0, $HOME . l:dir . s:DirMask)
-endfunction
-function! s:MyDirClasses(...)
-    let  s:DirCloseWindow = a:1
-    let  s:DirEditWindow = winnr()
-    call s:DirSetSpecific($HOME . "/classes") 
-    call s:MyDir(0, $HOME . "/classes/*.class")
-endfunction
-
-
-function! g:JAVASNIPS(...)
-    call s:MyDirAllSnips(a:1)
-endfunction
 
 function! g:DIRSELECTOPEN(...)
     "full path with wildcards
@@ -527,77 +371,6 @@ function! s:MyDirSelector(...)
     let  s:DirEditWindow = winnr()
     call s:DirSetSpecific(s:PathFullDirectory(a:1))
     call s:MyDir(1, a:1)
-endfunction
-
-
-function! s:MyDirJSnips(...)
-    let  s:DirCloseWindow = a:1
-    let  s:DirEditWindow = winnr()
-    let  l:dir="/.vim/bundle/vim-progsnips/plugin" 
-    call s:DirSetSpecific($HOME . l:dir) 
-    call s:MyDir(0, $HOME . l:dir . "/J*.txt")
-endfunction
-
-function! g:ALLSNIPS(...)
-    call s:MyDirAllSnips(a:1)
-endfunction
-function! s:MyDirAllSnips(...)
-    let  s:DirCloseWindow = a:1
-    let  s:DirEditWindow = winnr()
-    let  l:dir="/.vim/bundle/vim-progsnips/plugin" 
-    call s:DirSetSpecific($HOME . l:dir) 
-    call s:MyDir(0, $HOME . l:dir . "/*.txt", $HOME . l:dir . "/*.vim", $HOME . "/projects/*.project")
-endfunction
-
-
-
-function! g:AVIM()
-    let  s:DirCloseWindow = 1
-    let  s:DirEditWindow = winnr()
-
-    let  l:dir="/private/Snips" 
-    let  l:mask="/*"
-
-    call s:DirSetSpecific($HOME . l:dir) 
-    call s:MyDir(0, $HOME . l:dir . l:mask)
-    nnoremap <silent> <buffer> q :close<cr>
-    nnoremap <silent> <buffer> <leader>j :close<cr>:call g:BVIM()<cr> 
-endfunction
-function! g:BVIM()
-    let  s:DirCloseWindow = 1
-    let  s:DirEditWindow = winnr()
-
-    let  l:dir="/.vim/bundle/vim-progsnips/plugin" 
-    let  l:mask="/A.*.vim"
-
-    call s:DirSetSpecific($HOME . l:dir) 
-    call s:MyDir(0, $HOME . l:dir . l:mask)
-    nnoremap <silent> <buffer> q :close<cr>
-    nnoremap <silent> <buffer> <leader>j :close<cr>:call g:CVIM()<cr> 
-endfunction
-function! g:CVIM()
-    let  s:DirCloseWindow = 1
-    let  s:DirEditWindow = winnr()
-
-    let  l:dir="/.vim/bundle/vim-progsnips/plugin" 
-    let  l:mask="/J*.txt"
-
-    call s:DirSetSpecific($HOME . l:dir) 
-    call s:MyDir(0, $HOME . l:dir . l:mask)
-    nnoremap <silent> <buffer> q :close<cr>
-    nnoremap <silent> <buffer> <leader>j :close<cr>:call g:DVIM()<cr> 
-endfunction
-function! g:DVIM()
-    let  s:DirCloseWindow = 1
-    let  s:DirEditWindow = winnr()
-
-    let  l:dir="/.vim/bundle/vim-progsnips/plugin" 
-    let  l:mask="/*.txt"
-
-    call s:DirSetSpecific($HOME . l:dir) 
-    call s:MyDir(0, $HOME . l:dir . l:mask)
-    nnoremap <silent> <buffer> q :close<cr>
-    nnoremap <silent> <buffer> <leader>j :close<cr>:call g:AVIM()<cr> 
 endfunction
 
 

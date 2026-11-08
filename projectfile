@@ -1,14 +1,9 @@
-plugin/dir.vim
+plugin/ide.vim
 utils.vim
 inputpopup.vim
 popup.vim
-plugin/tester.vim
-pushit
 store.vim
-storeV2.vim
 tagit
-vim-dir.setup
 LICENSE
 README.md
-functions.txt
 projectfile
