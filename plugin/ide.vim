@@ -961,29 +961,3 @@ function! g:MySelectionAction(...)
          endif
      endif
 endfunction
-let s:term_bufnr = -1
-
-function! ToggleTerminal()
-    " Check if the terminal window is currently open and visible
-    if bufexists(s:term_bufnr) && bufwinnr(s:term_bufnr) != -1
-        " Close the window containing the terminal buffer
-        execute bufwinnr(s:term_bufnr) . 'wincmd c'
-    else
-        " If the buffer exists but the window is closed, reopen it botright
-        if bufexists(s:term_bufnr)
-            execute 'botright sb ' . s:term_bufnr
-        else
-            " Create a new terminal window botright and save its bufnr
-            botright terminal
-            let s:term_bufnr = bufnr('%')
-            " Optional: start in insert mode inside the terminal
-            startinsert
-        endif
-    endif
-endfunction
-
-" Create a convenient user command
-command! ToggleTerm call ToggleTerminal()
-
-" Optional keymap (e.g., <leader>t)
-nnoremap <silent> <leader>t :ToggleTerm<CR>
