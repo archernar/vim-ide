@@ -74,7 +74,7 @@ function! g:SystemCommand(...)
     if v:shell_error != 0
         call ShowPopupMessage("Error: " . l:output, 5000)
     else
-        call ShowPopupMessage("[" . a:1 ."]  Done", 3000)
+        call ShowPopupMessage("[" . a:1 ."]", 2000)
     endif
     "execute a:1
 endfunction

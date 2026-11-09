@@ -673,7 +673,6 @@ function! g:MySelectionAction(...)
              execute 'q'
              call s:vde()
           else
-             call ShowPopupMessage("File: " . l:sz, 1000)
              call HighlightLineWithStr('ColorGreen', l:sz)
              call g:JumpToLineWithStr(l:sz)
              call g:JumpToWindowByName('client')
