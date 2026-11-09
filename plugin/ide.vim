@@ -642,7 +642,6 @@ function! g:MySelectionAction(...)
      " **************************
      " This is the <enter> action
      " **************************
-     call ShowPopupMessage("CMD: " . l:sz, 8000)
      if (a:1 == 'rx')
          if (l:sz == s:cmdCommitAll)
              echom l:sz
@@ -651,8 +650,8 @@ function! g:MySelectionAction(...)
              echom l:sz
              execute "!git push origin master"
          elseif (l:sz == s:cmdCommitPush)
-             call g:SystemCommand("!git commit -a -m \"Commit-All\"")
-             call g:SystemCommand("!git push origin master")
+             call g:SystemCommand("git commit -a -m \"Commit-All\"")
+             call g:SystemCommand("git push origin master")
          elseif (l:sz == s:cmdCommitBuffer)
              call g:JumpToWindowByName('client')
              let l:fn=expand('%')
@@ -676,7 +675,7 @@ function! g:MySelectionAction(...)
              execute 'q'
              call s:vde()
           else
-             call ShowPopupMessage("File: " . l:sz, 3000)
+             call ShowPopupMessage("File: " . l:sz, 1000)
              call HighlightLineWithStr('ColorGreen', l:sz)
              call g:JumpToLineWithStr(l:sz)
              call g:JumpToWindowByName('client')
