@@ -1,6 +1,6 @@
 " *****************************************************************************************************
 " *****************************************************************************************************
-                "  dir.vim - a Simple Directory Lister/File Opener
+                "  ide.vim - a Simple Directory Lister/File Opener
                 "
                 "  For .bashrc
                 "  alias ide='vim -c "autocmd VimEnter * call DIRPF()"'
@@ -31,15 +31,20 @@ function! g:SwitcherDir()
     elseif (g:WindowsExist('dir','client'))
         call g:JumpToWindowByName('dir')
         close
-            call  s:vde()
-            call g:JumpToWindowByName('menu')
+        call  s:vde()
+        call g:JumpToWindowByName('menu')
     endif
 endfunction
 
 function! g:Switcher()
     if (g:AnyWindowsExist('menu','term','client','dir'))
         if (g:IsCurrentWindow('client'))
-            call g:JumpToWindowByName('menu')
+            if (g:AnyWindowsExist('menu'))
+                call g:JumpToWindowByName('menu')
+            endif
+            if (g:AnyWindowsExist('dir'))
+                call g:JumpToWindowByName('dir')
+            endif
             nnoremap <buffer> <Tab> :call g:Switcher()<cr>
             nnoremap <buffer> <leader>d :call g:SwitcherDir()<cr>
         elseif (g:IsCurrentWindow('menu'))
@@ -215,7 +220,7 @@ function! s:MyDir(...)
         " 8 Args
         "call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')", "x :call g:MyDirAction('e')", "n :call g:MyDirAction('n')", "p :call g:MyDirAction('p')", "v :call g:MyDirAction('v')","q :call g:MyDirAction('q')")
         call g:NewWindow("Left", &columns/3, "<Enter> :call g:MyDirAction('r')")
-        echom "<r> edit snip, <enter> read snip into current buffer, <l> load session file, <p> open and load project"
+        "echom "<r> edit snip, <enter> read snip into current buffer, <l> load session file, <p> open and load project"
         let w:window_name = 'dir'
         setlocal wincolor=MyCustomBg
         setlocal nonumber norelativenumber
@@ -248,8 +253,6 @@ function! s:MyDir(...)
     " Display Part
         setlocal cursorline
         call s:PutLineSet(1)
-
-        " call s:PutLine("[" . s:DirSet . "]")
         call s:PutLine("[" . g:Strreplace(s:DirSet,$HOME,"$HOME") . "]")
         call s:PutLine("..")
         let l:templ = []
@@ -514,13 +517,6 @@ function! g:DIRCPF()
 endfunction
 
 
-function! BufferEntry(...)
-    call win_gotoid(s:menu_win)
-    call s:MakeAllLinesWhite()
-    call HighlightLineWithStr('ColorGreen', a:1)
-    call win_gotoid(s:client_win)
-endfunction
-
 function! s:MyProject(...)
 
         if !filereadable($HOME . "/projects")
@@ -611,13 +607,6 @@ function! s:MyProject(...)
         let s:cmdViewLog="View-Log"
 
         set nowrap
-        let g:BoxHoriz      = '─'
-        let g:BoxVert       = '│'
-        let g:BoxTopRight   = '┐'
-        let g:BoxTopLeft    = '┌'
-
-        let g:BoxBotLeft    = '└'
-        let g:BoxBotRight   = '┘'
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
