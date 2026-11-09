@@ -17,7 +17,6 @@ if exists("g:loaded_plugin_dir") || v:version < 700 || &cp
     finish
 endif
 
-let g:menumode=1
 
 function! g:SwitcherDir()
     if (g:WindowsExist('menu','client'))
@@ -138,7 +137,6 @@ endfunction
 function! s:FileNameLastPart(...)
     return split(a:1,"[.]")[-1]
 endfunction
-
 function! s:FileNameBookEnds(...)
     let l:nRet = 0
     if (split(a:1,"[.]")[0] == a:2) 
@@ -155,8 +153,6 @@ function! s:FileNameIs(...)
     endif
     return l:nRet
 endfunction
-
-
 function! s:DirFileName(...)
     return  join(split(a:1,"/")[-1:-1])
 endfunction
@@ -333,14 +329,6 @@ function! s:MyDirSelector(...)
     call s:MyDir(1, a:1)
 endfunction
 
-
-function! g:MyBufferAction()
-          if (getline(".") != "Vim Buffers")
-              let l:ret = split(getline(".")," ")[-1]
-              exe "q"
-              execute "b " . l:ret
-          endif
-endfunction
 
 function! s:RemoveFirstToken(str)
     let l:tokens = split(a:str)
