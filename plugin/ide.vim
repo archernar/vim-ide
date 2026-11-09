@@ -638,8 +638,9 @@ function! g:MySelectionAction(...)
              echom l:sz
              execute "!git push origin master"
          elseif (l:sz == s:cmdCommitPush)
-             call g:SystemCommand("git commit -a -m \"Commit-All\"")
-             call g:SystemCommand("git push origin master")
+             call g:RunBashCommandAndShow(l:command)
+             call g:RunBashCommandAndShow("git commit -a -m \"Commit-All\"")
+             call g:RunBashCommandAndShow("git push origin master")
          elseif (l:sz == s:cmdStatus)
              let l:command = "git status"
              call g:RunBashCommandAndShow(l:command)
