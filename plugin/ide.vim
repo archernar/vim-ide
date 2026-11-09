@@ -651,9 +651,8 @@ function! g:MySelectionAction(...)
              echom l:sz
              execute "!git push origin master"
          elseif (l:sz == s:cmdCommitPush)
-             call g:SystemCommand("!git commit -a -m \"Commit-All\" > /dev/null 2>&1")
-             call g:SystemCommand("!git push origin master > /dev/null 2>&1")
-             call ShowPopupMessage("Done", 3000)
+             call g:SystemCommand("!git commit -a -m \"Commit-All\"")
+             call g:SystemCommand("!git push origin master")
          elseif (l:sz == s:cmdCommitBuffer)
              call g:JumpToWindowByName('client')
              let l:fn=expand('%')
