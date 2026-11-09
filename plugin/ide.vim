@@ -592,12 +592,14 @@ function! s:MyProject(...)
         let s:cmdPush="Push"
         let s:cmdCommitPush="Commit-Push"
         let s:cmdViewLog="View-Log"
+        let s:cmdStatus="Git-Status"
+        let s:cmdLog="Git-Log"
 
         set nowrap
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
-        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog)
+        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog)
         call s:PutInLineHeader('ColorMagenta', "Projects")
 
         for repo in l:projectlist
@@ -638,6 +640,12 @@ function! g:MySelectionAction(...)
          elseif (l:sz == s:cmdCommitPush)
              call g:SystemCommand("git commit -a -m \"Commit-All\"")
              call g:SystemCommand("git push origin master")
+         elseif (l:sz == s:cmdStatus)
+             let l:command = "git status"
+             call g:RunBashCommandAndShow(l:command)
+         elseif (l:sz == s:cmdLog)
+             let l:command = "git log -n 5 --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) <%an>%Creset' --stat"
+             call g:RunBashCommandAndShow(l:command)
          elseif (l:sz == s:cmdCommitBuffer)
              call g:JumpToWindowByName('client')
              let l:fn=expand('%')
