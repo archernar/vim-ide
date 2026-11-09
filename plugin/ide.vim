@@ -649,9 +649,7 @@ function! g:MySelectionAction(...)
              echom l:sz
              execute "!git push origin master"
          elseif (l:sz == s:cmdCommitPush)
-             call ShowPopupMessage("Commit All", 3000)
              call g:SystemCommand("!git commit -a -m \"Commit-All\"")
-             call ShowPopupMessage("Push", 3000)
              call g:SystemCommand("!git push origin master")
              call ShowPopupMessage("Done", 3000)
          elseif (l:sz == s:cmdCommitBuffer)
