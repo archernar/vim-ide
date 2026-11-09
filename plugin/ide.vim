@@ -641,6 +641,7 @@ function! g:MySelectionAction(...)
      " **************************
      " This is the <enter> action
      " **************************
+     call ShowPopupMessage("CMD: " . l:sz, 8000)
      if (a:1 == 'rx')
          if (l:sz == s:cmdCommitAll)
              echom l:sz
