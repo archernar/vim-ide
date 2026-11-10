@@ -66,6 +66,18 @@ function! g:Log(msg)
     call writefile([l:entry], l:logfile, 'a')
 endfunction
 
+function! g:RunBashCommand(...)
+    let l:sz = a:1
+    " Run commit and push silently in the background using system()
+    let l:output = system(l:sz)
+    " Optional: Check if an error occurred (v:shell_error is non-zero on failure)
+    if v:shell_error != 0
+        call ShowPopupMessage("Error: " . l:output, 5000)
+    else
+        call ShowPopupMessage("[" . a:1 ."]", 2000)
+    endif
+    "execute a:1
+endfunction
 function! g:SystemCommand(...)
     let l:sz = a:1
     " Run commit and push silently in the background using system()

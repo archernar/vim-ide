@@ -640,8 +640,10 @@ function! g:MySelectionAction(...)
              echom l:sz
              execute "!git push origin master"
          elseif (l:sz == s:cmdCommitPush)
-             call g:RunBashCommandAndShow("git commit -a -m \"Commit-All\"")
-             call g:RunBashCommandAndShow("git push origin master")
+             "call g:RunBashCommandAndShow("git commit -a -m \"Commit-All\"")
+             "call g:RunBashCommandAndShow("git push origin master")
+             call g:RunBashCommand("git commit -a -m \"Commit-All\"")
+             call g:RunBashCommand("git push origin master")
          elseif (l:sz == s:cmdUnusedFunctions)
              call g:JumpToWindowByName('client')
              let l:my_unused = g:GetUnusedBufferFunctionList()
