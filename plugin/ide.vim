@@ -640,7 +640,6 @@ function! g:MySelectionAction(...)
              echom l:sz
              execute "!git push origin master"
          elseif (l:sz == s:cmdCommitPush)
-             call g:RunBashCommandAndShow(l:command)
              call g:RunBashCommandAndShow("git commit -a -m \"Commit-All\"")
              call g:RunBashCommandAndShow("git push origin master")
          elseif (l:sz == s:cmdUnusedFunctions)
