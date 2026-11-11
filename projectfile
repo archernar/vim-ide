@@ -1,7 +1,7 @@
 plugin/ide.vim
 utils.vim
-inputpopup.vim
 popup.vim
+inputpopup.vim
 store.vim
 tagit
 LICENSE

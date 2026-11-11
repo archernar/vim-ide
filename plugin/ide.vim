@@ -503,6 +503,29 @@ function! g:DIRCPF()
     call s:MyProject()
 endfunction
 
+let g:ListCursor=-1
+
+function! g:GetThis()
+    return l:list[g:ListCursor]
+endfunction
+
+function! g:GetNext()
+    let g:ListCursor = g:ListCursor + 1
+    let l:list = readfile("./projectfile")
+    if (g:ListCursor > (len(l:list)-1))
+        let g:ListCursor = 0
+    endif
+    return l:list[g:ListCursor]
+endfunction
+
+" function! s:GetEntry(...)
+"        let l:list = readfile("./projectfile")
+"        return l:list[a:1]
+"endfunction
+"function! s:GetListLength()
+""        let l:list = readfile("./projectfile")
+"        return = len(l:list)
+"endfunction
 
 function! s:MyProject(...)
 
@@ -521,6 +544,8 @@ function! s:MyProject(...)
 
         call s:PutLineSet(0)
         let l:list = readfile("./projectfile")
+        let g:ListCursor=-1
+        call g:GetNext()
         let l:first_file = l:list[0]
         let s:listlength = len(l:list)
 
