@@ -1,36 +1,27 @@
 " ============================================================================
-" Ordered List Manager (Independent Sets)
+" Ordered List Manager (Independent Sets - Enhanced)
 " ============================================================================
 
-" ----------------------------------------------------------------------------
-" ListAppend(list, value)
-" Appends a value to the end of the specified list. 
-" ----------------------------------------------------------------------------
 function! ListAppend(list, value) abort
     call add(a:list, a:value)
+    return 1
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListInsert(list, index, value)
-" Inserts a value at the specified index in the list.
-" ----------------------------------------------------------------------------
 function! ListInsert(list, index, value) abort
-    call insert(a:list, a:value, a:index)
+    if a:index >= 0 && a:index <= len(a:list)
+        call insert(a:list, a:value, a:index)
+        return 1
+    else
+        echoerr "ListInsert: Index '" . a:index . "' is out of bounds."
+        return 0
+    endif
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListGet(list, index, [default])
-" Retrieves a value by its index from the specified list.
-" ----------------------------------------------------------------------------
 function! ListGet(list, index, ...) abort
     let l:default = a:0 > 0 ? a:1 : v:null
     return get(a:list, a:index, l:default)
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListChange(list, index, value)
-" Updates an existing value at the specified index.
-" ----------------------------------------------------------------------------
 function! ListChange(list, index, value) abort
     if a:index >= 0 && a:index < len(a:list)
         let a:list[a:index] = a:value
@@ -41,27 +32,27 @@ function! ListChange(list, index, value) abort
     endif
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListDelete(list, index)
-" Removes a value at the specified index.
-" ----------------------------------------------------------------------------
 function! ListDelete(list, index) abort
     if a:index >= 0 && a:index < len(a:list)
         return remove(a:list, a:index)
     else
         echoerr "ListDelete: Index '" . a:index . "' is out of bounds."
-        return 0
+        return v:null
     endif
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListSave(list, filepath)
-" Serializes the specified list to JSON and writes it to disk.
-" ----------------------------------------------------------------------------
 function! ListSave(list, filepath) abort
+    let l:path = expand(a:filepath)
+    let l:dir = fnamemodify(l:path, ':h')
+    
+    " Automatically create parent directories if they don't exist
+    if !isdirectory(l:dir)
+        call mkdir(l:dir, 'p')
+    endif
+
     try
         let l:json = json_encode(a:list)
-        call writefile([l:json], a:filepath)
+        call writefile([l:json], l:path)
         return 1
     catch
         echoerr "ListSave: Failed to write to " . a:filepath
@@ -69,22 +60,18 @@ function! ListSave(list, filepath) abort
     endtry
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListLoad(list, filepath)
-" Reads JSON from the specified file path and populates the given list.
-" ----------------------------------------------------------------------------
 function! ListLoad(list, filepath) abort
-    if !filereadable(a:filepath)
+    let l:path = expand(a:filepath)
+    if !filereadable(l:path)
         echoerr "ListLoad: File not readable at " . a:filepath
         return 0
     endif
 
     try
-        let l:lines = readfile(a:filepath)
+        let l:lines = readfile(l:path)
         if !empty(l:lines)
             let l:decoded = json_decode(l:lines[0])
             if type(l:decoded) == v:t_list
-                " Clear the existing list and populate it with the decoded data
                 call filter(a:list, '0')
                 call extend(a:list, l:decoded)
                 return 1
@@ -99,35 +86,13 @@ function! ListLoad(list, filepath) abort
     endtry
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListClear(list)
-" Empties an existing list in place.
-" ----------------------------------------------------------------------------
 function! ListClear(list) abort
     call filter(a:list, '0')
 endfunction
 
-" ----------------------------------------------------------------------------
-" ListIterateTemplate(list)
-" Iterates across all items in the specified list.
-" ----------------------------------------------------------------------------
-function! ListIterateTemplate(list) abort
-    let l:index = 0
-    for l:value in a:list
-        " Replace the line below with your custom logic
-        echo "Index: " . l:index . " | Value: " . string(l:value)
-        let l:index += 1
-    endfor
-endfunction
-
-" ----------------------------------------------------------------------------
-" ListDump(list)
-" Optional Utility: Returns a copy of the specified list for inspection.
-" ----------------------------------------------------------------------------
 function! ListDump(list) abort
     return deepcopy(a:list)
-endfunction
-
+endfunction`;
 " ============================================================================
 " USAGE EXAMPLES
 " ============================================================================
