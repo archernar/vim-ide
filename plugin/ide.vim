@@ -67,11 +67,14 @@ nnoremap <leader>d :call g:SwitcherDir()<cr>
 
 let s:nv_cache1 = {}
 let s:nv_cache2 = {}
+let s:my_history = []
+
 source ~/.vim/bundle/vim-ide/utils.vim
 
 source ~/.vim/bundle/vim-ide/popup.vim
 source ~/.vim/bundle/vim-ide/inputpopup.vim
 source ~/.vim/bundle/vim-ide/store.vim
+source ~/.vim/bundle/vim-ide/olist.vim
 
 let g:loaded_plugin_dir=1
 
@@ -545,6 +548,7 @@ function! s:MyProject(...)
         call s:PutLineSet(0)
         let l:list = readfile("./projectfile")
         let g:ListCursor=-1
+        call ListClear(s:my_history)
         call g:GetNext()
         let l:first_file = l:list[0]
         let s:listlength = len(l:list)
@@ -621,12 +625,13 @@ function! s:MyProject(...)
         let s:cmdLog="Git-Log"
         let s:cmdUnusedFunctions="UnFunctions"
         let s:cmdFunctions="Functions"
+        let s:cmdHistory="History"
 
         set nowrap
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
-        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions)
+        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory)
         call s:PutInLineHeader('ColorMagenta', "Projects")
 
         for repo in l:projectlist
@@ -641,6 +646,7 @@ function! s:MyProject(...)
 			call g:JumpToLineWithStr(l:first_file)
             exe "wincmd w"
             execute "e " .  s:DirSet . "/" . l:first_file
+            call ListAppend(s:my_history, s:DirSet . "/" . l:first_file)
             if (s:BrowseMode == 1)
                 exe "wincmd w"
             endif
@@ -677,6 +683,8 @@ function! g:MySelectionAction(...)
              call g:JumpToWindowByName('client')
              let l:my_unused = g:GetBufferFunctionList()
              call g:ShowPopupDict(l:my_unused)
+         elseif (l:sz == s:cmdHistory)
+             call g:ShowPopupList(s:my_history, 3500)
          elseif (l:sz == s:cmdStatus)
              let l:command = "git status"
              call g:RunBashCommandAndShow(l:command)
@@ -710,6 +718,7 @@ function! g:MySelectionAction(...)
              call g:JumpToLineWithStr(l:sz)
              call g:JumpToWindowByName('client')
              execute "e " .  s:DirSet . "/" . l:sz
+             call ListAppend(s:my_history, s:DirSet . "/" . l:sz)
              if (s:BrowseMode == 1)
                  call g:JumpToWindowByName('menu')
              endif

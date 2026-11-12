@@ -112,3 +112,30 @@ function! g:ShowPopupDict(dict, ...) abort
         call ShowPopupMessage(l:lines)
     endif
 endfunction
+" ----------------------------------------------------------------------------
+" ShowPopupList(list, [timeout_ms])
+"
+" Args:
+"   list: A List of items to display.
+"   [timeout_ms]: Optional. Time in milliseconds before auto-closing.
+" ----------------------------------------------------------------------------
+function! g:ShowPopupList(list, ...) abort
+    " Convert the list into a List of formatted strings
+    let l:lines = []
+    let l:index = 0
+
+    " Format each item with its index
+    for l:val in a:list
+        let l:str_val = string(l:val)
+        let l:formatted = printf('[%d]: %s', l:index, l:str_val)
+        call add(l:lines, l:formatted)
+        let l:index += 1
+    endfor
+
+    " Handle optional timeout argument
+    if a:0 > 0
+        call ShowPopupMessage(l:lines, a:1)
+    else
+        call ShowPopupMessage(l:lines)
+    endif
+endfunction

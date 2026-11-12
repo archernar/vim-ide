@@ -1,4 +1,5 @@
 plugin/ide.vim
+olist.vim
 utils.vim
 popup.vim
 inputpopup.vim
