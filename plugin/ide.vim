@@ -18,6 +18,7 @@ if exists("g:loaded_plugin_dir") || v:version < 700 || &cp
 endif
 
 
+
 function! g:SwitcherDir()
     if (g:WindowsExist('menu','client'))
         call g:JumpToWindowByName('menu')
