@@ -627,12 +627,13 @@ function! s:MyProject(...)
         let s:cmdUnusedFunctions="UnFunctions"
         let s:cmdFunctions="Functions"
         let s:cmdHistory="History"
+        let s:cmdScan="SecScan"
 
         set nowrap
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
-        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory)
+        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory,s:cmdScan)
         call s:PutInLineHeader('ColorMagenta', "Projects")
 
         for repo in l:projectlist
@@ -676,6 +677,9 @@ function! g:MySelectionAction(...)
              "call g:RunBashCommandAndShow("git push origin master")
              call g:RunBashCommand("git commit -a -m \"Commit-All\"")
              call g:RunBashCommand("git push origin master")
+         elseif (l:sz == s:cmdScan)
+             call g:JumpToWindowByName('client')
+             call g:SecurityScanBuffer()
          elseif (l:sz == s:cmdUnusedFunctions)
              call g:JumpToWindowByName('client')
              let l:my_unused = g:GetUnusedBufferFunctionList()
@@ -683,7 +687,7 @@ function! g:MySelectionAction(...)
          elseif (l:sz == s:cmdFunctions)
              call g:JumpToWindowByName('client')
              let l:my_unused = g:GetBufferFunctionList()
-             call g:ShowPopupDict(l:my_unused)
+             call g:ShowPopupDictInCols(4, l:my_unused)
          elseif (l:sz == s:cmdHistory)
              call g:ShowPopupList(s:my_history, 3500)
          elseif (l:sz == s:cmdStatus)

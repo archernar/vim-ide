@@ -7,7 +7,6 @@
 " ============================================================================
 " Unicode Box-Drawing & Graphic Character Variables
 " ============================================================================
-
 " Single-Line Box Characters (Light)
 let g:BoxHoriz      = '─'
 let g:BoxVert       = '│'
@@ -602,5 +601,49 @@ function! g:GetUnusedBufferFunctionList()
     endif
 
     return l:unused_dict
+endfunction
+
+function! g:SecurityScanBuffer() abort
+  " Using very magic (\v) mode to clean up patterns and prevent escaping bugs
+  let l:patterns = [
+        \ '\v\c(password|passwd|pwd)\s*[:=]\s*["''][^"'']{3,}["'']',
+        \ '\v\c(api[_-]?key|apikey|access[_-]?token|secret[_-]?key)\s*[:=]\s*["''][^"'']{8,}["'']',
+        \ '\v\cbearer\s+[a-zA-Z0-9_\-\.]{20,}',
+        \ '\v-----BEGIN\s+(RSA|PRIVATE|EC|DSA|OPENSSH)\s+KEY-----',
+        \ '\v<AKIA[0-9A-Z]{16}>',
+        \ '\v\caws[_-]?secret[_-]?access[_-]?key\s*[:=]\s*["''][0-9a-zA-Z/+=]{40}["'']',
+        \ '\v<AIza[0-9A-Za-z\-_]{35}>'
+        \ ]
+
+  let l:results = []
+  let l:lines = getline(1, '$')
+  let l:lnum = 1
+
+  " Evaluate each line in the current buffer
+  for l:line in l:lines
+    let l:matched = 0
+    for l:pat in l:patterns
+      if l:line =~# l:pat
+        let l:matched = 1
+        break
+      endif
+    endfor
+
+    if l:matched
+      let l:trimmed = len(l:line) > 70 ? l:line[:70] . '...' : l:line
+      call add(l:results, printf('Line %3d: %s', l:lnum, l:trimmed))
+    endif
+    let l:lnum += 1
+  endfor
+
+  " Format message for the popup utility
+  if empty(l:results)
+    let l:msg = ['[Security Scan] All clear! No sensitive strings detected.']
+  else
+    let l:msg = ['[Security Scan] WARNING: Potential secrets found:'] + [''] + l:results
+  endif
+
+  " Display using the custom ShowPopupMessage function[cite: 1]
+  call ShowPopupMessage(l:msg)
 endfunction
 

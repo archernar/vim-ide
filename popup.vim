@@ -76,8 +76,171 @@ endfunction
 " " 3. Multi-line message: Pass a List of strings
 " call ShowPopupMessage(["Line 1: Build failed", "Line 2: Check the logs"], 5000)
 " ============================================================================
+" ----------------------------------------------------------------------------
+" g:ShowPopupDict(num_cols, dict, [timeout_ms])
+"
+" Args:
+"   num_cols: Number of columns to display (e.g., 2, 3, 4).
+"   dict: A Dictionary of key-value pairs. Unused functions can be flagged
+"         or we can highlight lines matching specific criteria.
+"   [timeout_ms]: Optional. Time in milliseconds before auto-closing.
+" ----------------------------------------------------------------------------
+function! g:XXXXShowPopupDictInCols(num_cols, dict, ...) abort
+    let l:keys = sort(keys(a:dict))
+    let l:total = len(l:keys)
 
+    if l:total == 0 || a:num_cols < 1
+        call ShowPopupMessage(['[Empty Dictionary or Invalid Columns]'], a:0 > 0 ? a:1 : 0)
+        return
+    endif
 
+    let l:cols = a:num_cols
+    let l:rows = (l:total + l:cols - 1) / l:cols
+
+    let l:formatted_items = []
+    let l:max_lengths = repeat([0], l:cols)
+    let l:unused_keys = []
+
+    for l:i in range(l:total)
+        let l:key = l:keys[l:i]
+        let l:val = string(a:dict[l:key])
+        let l:item = printf('%s : %s', l:key, l:val)
+
+        " Track if this function is 'unused' (e.g., value is 0, false, or marked 'unused')
+        " Adjust this condition based on how your script flags unused functions
+        if a:dict[l:key] == 0 || a:dict[l:key] =~? 'unused'
+            call add(l:unused_keys, l:key)
+        endif
+
+        call add(l:formatted_items, l:item)
+
+        let l:c_idx = l:i / l:rows
+        let l:item_len = strdisplaywidth(l:item)
+        if l:item_len > l:max_lengths[l:c_idx]
+            let l:max_lengths[l:c_idx] = l:item_len
+        endif
+    endfor
+
+    let l:lines = []
+    let l:pad = 3
+
+    for l:r in range(l:rows)
+        let l:row_str = ''
+        let l:c in range(l:cols)
+            let l:item_idx = l:c * l:rows + l:r
+            if l:item_idx < l:total
+                let l:item = l:formatted_items[l:item_idx]
+                if l:c < l:cols - 1
+                    let l:row_str .= printf('%-*s', l:max_lengths[l:c] + l:pad, l:item)
+                else
+                    let l:row_str .= l:item
+                endif
+            endif
+        endfor
+        call add(l:lines, l:row_str)
+    endfor
+
+    " Define standard popup options (default text color is normal/white)
+    let l:options = {
+        \ 'pos': 'center',
+        \ 'padding': [1, 3, 1, 3],
+        \ 'border': [],
+        \ 'filter': function('s:AnyKeyFilter'),
+        \ 'highlight': 'Normal'
+        \ }
+
+    if a:0 > 0
+        let l:options['time'] = a:1
+    endif
+
+    if exists('*popup_create')
+        " Create the popup window
+        let l:winid = popup_create(l:lines, l:options)
+
+        " Get the buffer number of the popup window to apply syntax matching
+        let l:bufnr = winbufnr(l:winid)
+
+        " Define custom highlight for unused items (Red)
+        call setbufvar(l:bufnr, '&syntax', 'vimpopup')
+
+        " Highlight lines or specific keys matching unused functions in red (ErrorMsg)
+        if !empty(l:unused_keys)
+            " Construct a regex pattern matching any of the unused keys
+            let l:pat = '\v(' . join(l:unused_keys, '|') . ')\s*:\s*'
+            call win_execute(l:winid, 'syntax match PopupUnused /' . l:pat . '/ conceal off')
+            call win_execute(l:winid, 'highlight default link PopupUnused ErrorMsg')
+        endif
+    else
+        echo join(l:lines, "\n")
+    endfor
+endfunction
+" ----------------------------------------------------------------------------
+" g:ShowPopupDictInCols(num_cols, dict, [timeout_ms])
+"
+" Args:
+"   num_cols: Number of columns to display (e.g., 2, 3, 4).
+"   dict: A Dictionary of key-value pairs to display.
+"   [timeout_ms]: Optional. Time in milliseconds before auto-closing.
+" ----------------------------------------------------------------------------
+function! g:ShowPopupDictInCols(num_cols, dict, ...) abort
+    let l:keys = sort(keys(a:dict))
+    let l:total = len(l:keys)
+
+    if l:total == 0 || a:num_cols < 1
+        call ShowPopupMessage(['[Empty Dictionary or Invalid Columns]'], a:0 > 0 ? a:1 : 0)
+        return
+    endif
+
+    let l:cols = a:num_cols
+    " Calculate rows needed based on total items and column count
+    let l:rows = (l:total + l:cols - 1) / l:cols
+
+    " Format all key-value pairs first
+    let l:formatted_items = []
+    let l:max_lengths = repeat([0], l:cols)
+
+    for l:i in range(l:total)
+        let l:key = l:keys[l:i]
+        let l:val = string(a:dict[l:key])
+        let l:item = printf('%s : %s', l:key, l:val)
+        call add(l:formatted_items, l:item)
+
+        " Determine which column this item lands in
+        let l:c_idx = l:i / l:rows
+        let l:item_len = strdisplaywidth(l:item)
+        if l:item_len > l:max_lengths[l:c_idx]
+            let l:max_lengths[l:c_idx] = l:item_len
+        endif
+    endfor
+
+    " Build the row lines by distributing items across columns (column-major order)
+    let l:lines = []
+    let l:pad = 3 " Spacing between columns
+
+    for l:r in range(l:rows)
+        let l:row_str = ''
+        for l:c in range(l:cols)
+            let l:item_idx = l:c * l:rows + l:r
+            if l:item_idx < l:total
+                let l:item = l:formatted_items[l:item_idx]
+                " If it's not the last column, pad it to align with the column width
+                if l:c < l:cols - 1
+                    let l:row_str .= printf('%-*s', l:max_lengths[l:c] + l:pad, l:item)
+                else
+                    let l:row_str .= l:item
+                endif
+            endif
+        endfor
+        call add(l:lines, l:row_str)
+    endfor
+
+    " Handle optional timeout argument (passed as the 3rd argument here)
+    if a:0 > 0
+        call ShowPopupMessage(l:lines, a:1)
+    else
+        call ShowPopupMessage(l:lines)
+    endif
+endfunction
 " ----------------------------------------------------------------------------
 " ShowPopupDict(dict, [timeout_ms])
 "
