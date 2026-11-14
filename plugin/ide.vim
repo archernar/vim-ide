@@ -33,6 +33,7 @@ function! g:SwitcherDir()
         call  s:vde()
         call g:JumpToWindowByName('menu')
     endif
+    redraw!
 endfunction
 
 function! g:Switcher()
@@ -60,15 +61,27 @@ function! g:Switcher()
             let NOTHING=0
         endif
     endif
+    redraw!
 endfunction
 
+let g:fcursor = 0
+function! g:FileListSwitcher() abort
+    if (g:WindowExists('client'))
+        call g:JumpToWindowByName('client')
+        let g:fcursor = !g:fcursor
+        execute "e " . s:my_filelist[g:fcursor]
+    endif
+    redraw!
+endfunction
 
 nnoremap <Tab> :call g:Switcher()<cr>
+nnoremap <leader><Tab> :call g:FileListSwitcher()<cr>
 nnoremap <leader>d :call g:SwitcherDir()<cr>
 
 let s:nv_cache1 = {}
 let s:nv_cache2 = {}
 let s:my_history = []
+let s:my_filelist = []
 
 source ~/.vim/bundle/vim-ide/utils.vim
 
@@ -550,6 +563,7 @@ function! s:MyProject(...)
         let l:list = readfile("./projectfile")
         let g:ListCursor=-1
         call ListClear(s:my_history)
+        call ListClear(s:my_filelist)
         call g:GetNext()
         let l:first_file = l:list[0]
         let s:listlength = len(l:list)
@@ -606,6 +620,7 @@ function! s:MyProject(...)
                  call StorePut(s:nv_cache2, key, key)
                  call g:JumpToWindowByName('client')
                  execute "e " .  s:DirSet . "/" . key
+                 call ListAppend(s:my_filelist, s:DirSet . "" . key)
                  call g:JumpToWindowByName('menu')
         endfor
 
@@ -628,12 +643,13 @@ function! s:MyProject(...)
         let s:cmdFunctions="Functions"
         let s:cmdHistory="History"
         let s:cmdScan="SecScan"
+        let s:cmdFileList="FileList"
 
         set nowrap
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
-        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory,s:cmdScan)
+        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory,s:cmdScan,s:cmdFileList)
         call s:PutInLineHeader('ColorMagenta', "Projects")
 
         for repo in l:projectlist
@@ -690,6 +706,8 @@ function! g:MySelectionAction(...)
              call g:ShowPopupDictInCols(4, l:my_unused)
          elseif (l:sz == s:cmdHistory)
              call g:ShowPopupList(s:my_history, 3500)
+         elseif (l:sz == s:cmdFileList)
+             call g:ShowPopupList(s:my_filelist, 3500)
          elseif (l:sz == s:cmdStatus)
              let l:command = "git status"
              call g:RunBashCommandAndShow(l:command)
