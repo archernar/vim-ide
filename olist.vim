@@ -132,3 +132,88 @@ endfunction`;
 
 " Execute the custom iteration function
 " call ProcessFruitList(my_fruits)
+
+" ==============================================================================
+" Vimscript Data Structures: Lists ([]) vs. Dictionaries ({})
+" ==============================================================================
+"
+" Quick Comparison:
+" ------------------------------------------------------------------------------
+" Feature           | List ([])                        | Dictionary ({})
+" ------------------------------------------------------------------------------
+" Data Structure    | Ordered sequence (integer index) | Key-value pairs (string keys)
+" Access Method     | Numeric index starting at 0      | String key (dict['key'] or dict.key)
+" Data Types        | Mixed types allowed              | Mixed values; keys are strings
+" Common Uses       | Sequences, lines, arguments      | Configurations, caching, mapping
+" ------------------------------------------------------------------------------
+"
+" 1. LISTS ([])
+" - An ordered collection where items are accessed by their numerical position.
+" - Zero-indexed (0 is the first item, -1 is the last item).
+" - Example usage:
+"   let my_list = ['apple', 'banana', 'cherry']
+"   echo my_list[0]        " Output: apple
+"   echo my_list[-1]       " Output: cherry
+"   call add(my_list, 'date')
+"   let my_list = my_list + ['elderberry']
+"
+" 2. DICTIONARIES ({})
+" - An unordered collection of key-value pairs.
+" - Keys are always strings (numeric keys are automatically cast to strings).
+" - Accessed via bracket notation (dict['key']) or dot notation (dict.key).
+" - Example usage:
+"   let my_dict = {'name': 'vim', 'version': 9.0, 'enabled': v:true}
+"   echo my_dict['name']   " Output: vim
+"   echo my_dict.version   " Output: 9.0
+"   let my_dict['author'] = 'Bram Moolenaar'
+"   let my_dict.version = 9.1
+"
+"   " Iterating through a dictionary:
+"   for [key, value] in items(my_dict)
+"     echo key . ': ' . value
+"   endfor
+" ==============================================================================
+" ==============================================================================
+" Advanced Vimscript Functions for Lists and Dictionaries
+" ==============================================================================
+"
+" 1. map() - Modify elements in-place
+" - Iterates through each element, evaluating an expression where 'v:val' 
+"   represents the current value (and 'v:key' the index or key).
+" - Example (Double every number in a list):
+"   let numbers = [1, 2, 3, 4]
+"   call map(numbers, 'v:val * 2')
+"   " numbers is now [2, 4, 6, 8]
+"
+" 2. filter() - Keep or remove elements based on a condition
+" - Evaluates an expression; if it evaluates to 0 (false), the item is removed.
+" - Example (Keep only even numbers in a list):
+"   let nums = [1, 2, 3, 4, 5, 6]
+"   call filter(nums, 'v:val % 2 == 0')
+"   " nums is now [2, 4, 6]
+"
+" 3. extend() - Combine collections
+" - Appends items from one list/dictionary into another.
+" - Example (Combining lists):
+"   let list_a = [1, 2]
+"   let list_b = [3, 4]
+"   call extend(list_a, list_b)
+"   " list_a is now [1, 2, 3, 4]
+"
+" 4. keys() and values() - Extract dictionary parts
+" - Returns a list of a dictionary's keys or values.
+" - Example:
+"   let settings = {'theme': 'dark', 'tabstop': 4}
+"   echo keys(settings)     " Output: ['theme', 'tabstop']
+"   echo values(settings)   " Output: ['dark', 4]
+"
+" 5. sort() and reverse() - Order collections
+" - Example:
+"   let unsorted = ['banana', 'apple', 'cherry']
+"   call sort(unsorted)
+"   " unsorted is now ['apple', 'banana', 'cherry']
+"   call reverse(unsorted)
+"   " unsorted is now ['cherry', 'banana', 'apple']
+" ==============================================================================
+
+
