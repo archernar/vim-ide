@@ -19,7 +19,7 @@ endif
 
 
 
-function! g:SwitcherDir()
+function! g:SwitcherDir() abort
     if (g:WindowsExist('menu','client'))
         call g:JumpToWindowByName('menu')
         close
@@ -33,10 +33,9 @@ function! g:SwitcherDir()
         call  s:vde()
         call g:JumpToWindowByName('menu')
     endif
-    redraw!
 endfunction
 
-function! g:Switcher()
+function! g:Switcher() abort
     if (g:AnyWindowsExist('menu','term','client','dir'))
         if (g:IsCurrentWindow('client'))
             if (g:AnyWindowsExist('menu'))
@@ -61,7 +60,6 @@ function! g:Switcher()
             let NOTHING=0
         endif
     endif
-    redraw!
 endfunction
 
 let g:fcursor = 0
@@ -71,7 +69,6 @@ function! g:FileListSwitcher() abort
         let g:fcursor = !g:fcursor
         execute "e " . s:my_filelist[g:fcursor]
     endif
-    redraw!
 endfunction
 
 nnoremap <Tab> :call g:Switcher()<cr>
@@ -203,7 +200,7 @@ function! s:PutLine(...)
 endfunction
 
 
-function! s:MyDir(...)
+function! s:MyDir(...) abort
         let l:CommandType = a:1
         call s:PutLineSet(0)
         " Load Directory Part
@@ -544,7 +541,7 @@ endfunction
 "        return = len(l:list)
 "endfunction
 
-function! s:MyProject(...)
+function! s:MyProject(...) abort
 
         if !filereadable($HOME . "/projects")
             return
@@ -674,7 +671,7 @@ function! s:MyProject(...)
 
 endfunc
 
-function! g:MySelectionAction(...)
+function! g:MySelectionAction(...) abort
 
      let l:sz   = s:DirToken(getline("."))
      let l:sz   = getline(".")
