@@ -290,7 +290,9 @@ function! g:ShowPopupList(list, ...) abort
     " Format each item with its index
     for l:val in a:list
         let l:str_val = string(l:val)
+        let l:str_val = substitute(l:str_val, "^'\\(.*\\)'$", "\\1", "")
         let l:formatted = printf('[%d]: %s', l:index, l:str_val)
+        let l:formatted = printf('%s', l:str_val)
         call add(l:lines, l:formatted)
         let l:index += 1
     endfor

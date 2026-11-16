@@ -643,12 +643,13 @@ function! s:MyProject(...) abort
         let s:cmdHistory="History"
         let s:cmdScan="SecScan"
         let s:cmdFileList="FileList"
+        let s:cmdRunBash="RunBash"
 
         set nowrap
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
-        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory,s:cmdScan,s:cmdFileList)
+        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory,s:cmdScan,s:cmdFileList,s:cmdRunBash)
         call s:PutInLineHeader('ColorMagenta', "Projects")
 
         for repo in l:projectlist
@@ -735,6 +736,14 @@ function! g:MySelectionAction(...) abort
              execute 'cd ' .  StoreGet(s:nv_cache1, l:sz)
              execute 'q'
              call s:vde()
+         elseif (l:sz == s:cmdRunBash)
+             let l:user_cmd = input("Enter Bash Command: ")
+             redraw!
+             if !empty(l:user_cmd)
+                 let l:ret = systemlist('bash -c ' . shellescape(l:user_cmd))
+                 call g:ShowPopupList(l:ret)
+             endif
+             call g:JumpToWindowByName('menu')
           else
              call HighlightLineWithStr('ColorGreen', l:sz)
              call g:JumpToLineWithStr(l:sz)
