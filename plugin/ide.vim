@@ -11,6 +11,8 @@
   "  let g:airline#extensions#tabline#enabled = 0
   "  Ensure Vim's native tabline does not appear at the top either unless multiple tabs are open
   "  set showtabline=1
+  "
+  "  find . -type f -regex '.*\.\(txt\|md\|vim\)$' | sed 's|^\./||'
   " *************************************************************************************
   "
 if exists("g:loaded_plugin_dir") || v:version < 700 || &cp
