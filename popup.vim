@@ -297,6 +297,8 @@ function! g:ShowPopupList(list, ...) abort
         let l:index += 1
     endfor
 
+" my_list is now ['a', 'b', 'c', 'd']
+
     " Handle optional timeout argument
     if a:0 > 0
         call ShowPopupMessage(l:lines, a:1)

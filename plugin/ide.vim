@@ -689,8 +689,6 @@ function! g:MySelectionAction(...) abort
              echom l:sz
              execute "!git push origin master"
          elseif (l:sz == s:cmdCommitPush)
-             "call g:RunBashCommandAndShow("git commit -a -m \"Commit-All\"")
-             "call g:RunBashCommandAndShow("git push origin master")
              call g:RunBashCommand("git commit -a -m \"Commit-All\"")
              call g:RunBashCommand("git push origin master")
          elseif (l:sz == s:cmdScan)
@@ -710,10 +708,17 @@ function! g:MySelectionAction(...) abort
              call g:ShowPopupList(s:my_filelist, 3500)
          elseif (l:sz == s:cmdStatus)
              let l:command = "git status"
-             call g:RunBashCommandAndShow(l:command)
+             let l:ret = systemlist('bash -c ' . shellescape(l:command))
+             call insert(l:ret, l:command, 0)
+             call g:ShowPopupList(l:ret)
+
          elseif (l:sz == s:cmdLog)
              let l:command = "git log -n 5 --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) <%an>%Creset' --stat"
-             call g:RunBashCommandAndShow(l:command)
+             let l:ret = systemlist('bash -c ' . shellescape(l:command))
+             call insert(l:ret, l:command, 0)
+             call g:ShowPopupList(l:ret)
+
+
          elseif (l:sz == s:cmdCommitBuffer)
              call g:JumpToWindowByName('client')
              let l:fn=expand('%')
