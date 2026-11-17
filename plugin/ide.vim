@@ -702,10 +702,12 @@ function! g:MySelectionAction(...) abort
              call g:JumpToWindowByName('client')
              let l:my_unused = g:GetBufferFunctionList()
              call g:ShowPopupDictInCols(4, l:my_unused)
+
          elseif (l:sz == s:cmdHistory)
              call g:ShowPopupList(s:my_history, 3500)
          elseif (l:sz == s:cmdFileList)
              call g:ShowPopupList(s:my_filelist, 3500)
+
          elseif (l:sz == s:cmdStatus)
              let l:command = "git status"
              let l:ret = systemlist('bash -c ' . shellescape(l:command))
