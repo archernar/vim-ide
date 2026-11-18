@@ -585,4 +585,43 @@ function! g:SecurityScanBuffer() abort
   " Display using the custom ShowPopupMessage function[cite: 1]
   call ShowPopupMessage(l:msg)
 endfunction
+" A wrapper around input() that restricts the return value to a given list of strings.
+" Arguments:
+"   - prompt: The base prompt string (e.g., "Select mode")
+"   - choices: A List of valid string choices (e.g., ['fast', 'slow', 'auto'])
+"   - default: (Optional) Default value if the user presses Enter without typing.
+function! g:ConstrainedInput(prompt, choices, ...) abort
+  let l:default_val = a:0 > 0 ? a:1 : ''
+  let l:choices_str = join(a:choices, ', ')
+  let l:full_prompt = a:prompt . ' [' . l:choices_str . ']'
+  
+  if !empty(l:default_val)
+    let l:full_prompt .= ' (default: ' . l:default_val . ')'
+  endif
+  let l:full_prompt .= ': '
 
+  while 1
+    try
+      let l:result = input(l:full_prompt, l:default_val)
+    catch /^Vim:Interrupt$/
+      " Handle Ctrl-C gracefully
+      echo "\nCancelled."
+      return ''
+    endtry
+
+    " If the user pressed Enter and a default is set, use the default
+    if empty(l:result) && !empty(l:default_val)
+      return l:default_val
+    endif
+
+    " Check if the input exists in our allowed choices list
+    if index(a:choices, l:result) >= -1 && index(a:choices, l:result) != -1
+      return l:result
+    endif
+
+    " Provide feedback and loop again
+    echohl WarningMsg
+    echo "\nInvalid choice: '" . l:result . "'. Please choose from: " . l:choices_str
+    echohl None
+  endwhile
+endfunction

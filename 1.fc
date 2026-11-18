@@ -1,3 +1,134 @@
+FLASHCARD 0
+0 Vimscript Fundamentals & Variables
+
+Vimscript variable scopes:
+    b: - local to the current buffer
+    w: - local to the current window
+    t: - local to the current tab page
+    g: - global variable (accessible everywhere)
+    l: - local to a function (must be explicitly used)
+    s: - script-local (accessible only within current script)
+    a: - function argument scope
+    v: - internal Vim predefined variable
+
+Basic Assignment & Echo:
+    let g:my_var = "Hello Vim"
+    echo g:my_var
+    echomsg "Saved to message history!"
+
+FLASHCARD 1
+1 Functions in Vimscript
+
+Defining a Function:
+    function! MyFunction(arg1, ...) abort
+        " Function body
+        return a:arg1
+    endfunction
+
+Key points:
+    - The '!' allows re-defining/overwriting the function without errors.
+    - 'abort' stops execution immediately if any command fails.
+    - 'a:0' and 'a:1' handle optional arguments (varargs).
+    - Arguments are accessed via 'a:argname'.
+
+FLASHCARD 2
+2 Conditionals & Control Flow
+
+if / elseif / else statement:
+    if l:val > 10
+        echo "Large"
+    elseif l:val == 10
+        echo "Exact"
+    else
+        echo "Small"
+    endif
+
+Comparison Operators (Strictly typed vs. case-folded):
+    ==# : exact match (case-sensitive)
+    ==? : case-insensitive match
+    ==  : matches user's 'ignorecase' setting
+    (Applies similarly to !=, >, <, etc.)
+
+FLASHCARD 3
+3 Loops in Vimscript
+
+For Loops:
+    " Iterating over a list
+    for l:item in ['apple', 'banana', 'orange']
+        echomsg l:item
+    endfor
+
+    " Iterating over a range
+    for l:i in range(1, 5)
+        echo l:i
+    endfor
+
+While Loops:
+    let l:x = 3
+    while l:x > 0
+        echo l:x
+        let l:x -= 1
+    endwhile
+
+FLASHCARD 4
+4 Working with Lists and Dictionaries
+
+Lists:
+    let l:my_list = [1, 2, 3]
+    call add(l:my_list, 4)
+    let l:first = l:my_list[0]
+    let l:length = len(l:my_list)
+
+Dictionaries:
+    let l:my_dict = {'name': 'vim', 'version': 9}
+    let l:val = get(l:my_dict, 'name', 'default')
+    let l:keys = keys(l:my_dict)
+    let l:has_key = has_key(l:my_dict, 'version')
+
+FLASHCARD 5
+5 File & Buffer IO
+
+Reading files:
+    " Returns a List of lines from a file
+    let l:lines = readfile('filename.txt')
+
+Writing files:
+    " Writes a List of lines to a file
+    call writefile(['Line 1', 'Line 2'], 'output.txt')
+
+Checking file status:
+    if filereadable('filename.txt')
+        echo "File exists and is readable"
+    endif
+
+FLASHCARD 6
+6 Executing Commands & Vim APIs
+
+Executing Ex commands:
+    execute 'bdelete!'
+    execute 'vsplit ' . fname
+
+Evaluating Vim expressions and running Normal mode:
+    let l:bufnr = bufnr('%')
+    normal! ggVGyy
+
+Window and Buffer properties:
+    let l:current_file = expand('%:p')
+    call setbufvar(l:bufnr, '&syntax', 'python')
+
+FLASHCARD 7
+7 Custom Commands & Mapping
+
+Defining a Command:
+    " -nargs=1 requires 1 argument, -complete=file enables path completion
+    command! -nargs=1 -complete=file MyCommand call MyFunc(<f-args>)
+
+Mapping Keys:
+    " Normal mode mapping (noremap prevents recursive mapping recursion)
+    nnoremap <leader>w :w<CR>
+
+    " Buffer-local mapping
+    nnoremap <buffer> <leader>q :q<CR>
 
 FLASHCARD 0
 0 Remember
