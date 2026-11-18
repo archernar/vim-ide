@@ -1,10 +1,9 @@
 plugin/ide.vim
+flashcard.vim
+1.fc
 olist.vim
 utils.vim
 popup.vim
 inputpopup.vim
 store.vim
-tagit
-LICENSE
-README.md
 projectfile

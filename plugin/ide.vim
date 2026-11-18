@@ -19,8 +19,6 @@ if exists("g:loaded_plugin_dir") || v:version < 700 || &cp
     finish
 endif
 
-
-
 function! g:SwitcherDir() abort
     if (g:WindowsExist('menu','client'))
         call g:JumpToWindowByName('menu')
@@ -42,6 +40,7 @@ function! g:Switcher() abort
         if (g:IsCurrentWindow('client'))
             if (g:AnyWindowsExist('menu'))
                 call g:JumpToWindowByName('menu')
+                nnoremap <buffer> f :call g:JumpToWindowByName('client')<bar>call ShowFlashcardFile("1.fc")<cr>
             endif
             if (g:AnyWindowsExist('dir'))
                 call g:JumpToWindowByName('dir')
@@ -88,6 +87,7 @@ source ~/.vim/bundle/vim-ide/popup.vim
 source ~/.vim/bundle/vim-ide/inputpopup.vim
 source ~/.vim/bundle/vim-ide/store.vim
 source ~/.vim/bundle/vim-ide/olist.vim
+source ~/.vim/bundle/vim-ide/flashcard.vim
 
 let g:loaded_plugin_dir=1
 
@@ -640,6 +640,7 @@ function! s:MyProject(...) abort
         let s:cmdLog="Git-Log"
         let s:cmdUnusedFunctions="UnFunctions"
         let s:cmdFunctions="Functions"
+        let s:cmdFlashcards="Flashcards"
         let s:cmdHistory="History"
         let s:cmdScan="SecScan"
         let s:cmdFileList="FileList"
@@ -649,7 +650,7 @@ function! s:MyProject(...) abort
 
         call s:PutInLineHeader('ColorMagenta', "Actions-Config")
         call s:PutLineColor('ColorYellow', "Vim" . g:GetVimVersionString() . (exists('*popup_dialog') ? ", ":", No ") . "Popups")
-        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory,s:cmdScan,s:cmdFileList,s:cmdRunBash)
+        call s:PutLineColor('ColorYellow',s:cmdBrowseModeOff, s:cmdSetComment, "", s:cmdCommitBuffer,s:cmdCommitAll, s:cmdPush, s:cmdCommitPush, s:cmdViewLog, s:cmdStatus, s:cmdLog, s:cmdFunctions,s:cmdUnusedFunctions,s:cmdHistory,s:cmdScan,s:cmdFileList,s:cmdRunBash,s:cmdFlashcards)
         call s:PutInLineHeader('ColorMagenta', "Projects")
 
         for repo in l:projectlist
@@ -678,6 +679,7 @@ function! g:MySelectionAction(...) abort
 
      let l:sz   = s:DirToken(getline("."))
      let l:sz   = getline(".")
+     let l:szWORD = expand('<cWORD>')
      " **************************
      " This is the <enter> action
      " **************************
@@ -702,7 +704,9 @@ function! g:MySelectionAction(...) abort
              call g:JumpToWindowByName('client')
              let l:my_unused = g:GetBufferFunctionList()
              call g:ShowPopupDictInCols(4, l:my_unused)
-
+         elseif (l:sz == s:cmdFlashcards)
+             call g:JumpToWindowByName('client')
+             call ShowFlashcardFile("1.fc")
          elseif (l:sz == s:cmdHistory)
              call g:ShowPopupList(s:my_history, 3500)
          elseif (l:sz == s:cmdFileList)
@@ -739,7 +743,7 @@ function! g:MySelectionAction(...) abort
              let s:BrowseMode = s:BrowseMode ? 0 : 1
              call setline('.', s:BrowseMode ? s:cmdBrowseMode : s:cmdBrowseModeOff)
          elseif (g:StartsWith("PRJ ", l:sz))
-             call ShowPopupMessage('cd ' .  StoreGet(s:nv_cache1, l:sz), 1000)
+             call ShowPopupMessage('cd ' .  StoreGet(s:nv_cache1, l:sz), 5000)
              execute 'cd ' .  StoreGet(s:nv_cache1, l:sz)
              execute 'q'
              call s:vde()
