@@ -625,3 +625,43 @@ function! g:ConstrainedInput(prompt, choices, ...) abort
     echohl None
   endwhile
 endfunction
+" Presents a numbered menu from files in `dir` matching `pattern` (default '*.fc').
+" Returns the selected filename (e.g., 'foo.fc'), or '' if cancelled or none found.
+function! g:SelectFromFolder(dir, ...) abort
+  let l:pattern = a:0 > 0 ? a:1 : '*.fc'
+  let l:clean_dir = fnamemodify(a:dir, ':p')
+  let l:glob_expr = l:clean_dir . l:pattern
+
+  " Get matching paths and extract just the filenames (:t)
+  let l:matches = glob(l:glob_expr, 0, 1)
+  call map(l:matches, 'fnamemodify(v:val, ":t")')
+
+  if empty(l:matches)
+    echohl WarningMsg
+    echo 'No files matching ' . l:pattern . ' in ' . l:clean_dir
+    echohl None
+    return ''
+  endif
+
+  " Build inputlist() lines: first line is the header, rest are numbered choices
+  let l:lines = ['Select a file (' . l:pattern . ') in ' . a:dir . ':']
+  let l:idx = 1
+  for l:name in l:matches
+    call add(l:lines, l:idx . '. ' . l:name)
+    let l:idx += 1
+  endfor
+
+  try
+    let l:choice = inputlist(l:lines)
+  catch /^Vim:Interrupt$/
+    echo "\nCancelled."
+    return ''
+  endtry
+
+  " inputlist() returns 0 if the user presses <Esc> or enters 0
+  if l:choice < 1 || l:choice > len(l:matches)
+    return ''
+  endif
+
+  return l:matches[l:choice - 1]
+endfunction

@@ -1,0 +1,104 @@
+FLASHCARD 0
+0 Disk, Filesystem & Mount Diagnostics
+
+Top 10 largest directories in current path:
+    du -h -x --max-depth=2 . 2>/dev/null | sort -hr | head -n 10
+
+Filesystem usage (excluding pseudo/tmpfs):
+    df -h -x tmpfs -x devtmpfs
+
+Find large files (>500M) on local filesystem:
+    find / -xdev -type f -size +500M -exec ls -lh {} + 2>/dev/null
+
+Active NFS/network mounts & mount options:
+    mount -t nfs,nfs4,cifs
+
+FLASHCARD 1
+1 Processes, Memory & Load
+
+Top 10 processes by RSS memory (MB):
+    ps -eo pid,ppid,user,%cpu,rss,comm --sort=-rss | awk 'NR==1{print $0; next} {$5=sprintf("%.1fMB",$5/1024); print}' | head -n 11
+
+Top 10 processes by CPU usage:
+    ps -eo pid,user,%cpu,%mem,etime,args --sort=-%cpu | head -n 11
+
+Processes holding deleted-but-open files (space leak check):
+    lsof +L1 2>/dev/null
+
+Load average vs CPU core count:
+    uptime && nproc
+
+FLASHCARD 2
+2 Network, Sockets & Connectivity
+
+Listening TCP/UDP sockets with process names:
+    ss -tulpn
+
+Established TCP connections grouped by remote IP:
+    ss -tan state established | awk 'NR>1 {print $5}' | sed 's/:[^:]*$//' | sort | uniq -c | sort -nr | head -n 15
+
+Quick TCP port reachability check (timeout 2s):
+    timeout 2 bash -c '</dev/tcp/127.0.0.1/22' && echo "OPEN" || echo "CLOSED"
+
+Public/interface IP & default route summary:
+    ip -br addr && ip route show default
+
+FLASHCARD 3
+3 Logs, Journald & Log Parsing
+
+Recent errors from systemd journal (last 2 hours):
+    journalctl --since "2 hours ago" -p err..emerg --no-pager
+
+Top 20 client IPs in an Nginx/Apache access log:
+    awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -nr | head -n 20
+
+Count status codes in web access log:
+    awk '{print $9}' /var/log/nginx/access.log | sort | uniq -c | sort -nr
+
+Follow multiple logs with color/headers:
+    tail -n 30 -F /var/log/syslog /var/log/auth.log 2>/dev/null
+
+FLASHCARD 4
+4 Permissions, Ownership & File Hygiene
+
+Find world-writable files/directories (excluding /proc, /sys):
+    find / -path /proc -prune -o -path /sys -prune -o \( -perm -0002 -a ! -type l \) -print 2>/dev/null
+
+Find SUID/SGID binaries:
+    find / -xdev \( -perm -4000 -o -perm -2000 \) -type f -exec ls -ld {} + 2>/dev/null
+
+Files modified in the last 24 hours under /etc:
+    find /etc -type f -mtime -1 -ls 2>/dev/null
+
+Audit ~/.ssh directory and key permissions:
+    ls -la ~/.ssh && stat -c "%a %n" ~/.ssh/* 2>/dev/null
+
+FLASHCARD 5
+5 Systemd Services & Unit Health
+
+All failed systemd units:
+    systemctl --failed --no-legend
+
+All active service units and sub-states:
+    systemctl list-units --type=service --state=running,degraded --no-pager
+
+Last 50 log lines for a specific unit:
+    journalctl -u ssh.service -n 50 --no-pager
+
+Reload systemd units after editing unit/drop-in files:
+    systemctl daemon-reload && systemctl is-active ssh.service
+
+FLASHCARD 6
+6 Users, Sessions & System Identity
+
+Currently logged-in users and active terminals:
+    w -h
+
+Last 15 logins (SSH/TTY):
+    last -n 15 -a
+
+List human users (UID >= 1000) with login shells:
+    awk -F: '$3 >= 1000 && $3 < 65534 {print $1 ":" $3 ":" $6 ":" $7}' /etc/passwd
+
+Kernel, OS release & uptime snapshot:
+    uname -sr && cat /etc/os-release 2>/dev/null | head -n 4 && uptime -p

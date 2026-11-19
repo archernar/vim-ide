@@ -706,9 +706,10 @@ function! g:MySelectionAction(...) abort
              call g:ShowPopupDictInCols(4, l:my_unused)
          elseif (l:sz == s:cmdFlashcards)
              call g:JumpToWindowByName('client')
-             let l:user_input = g:ConstrainedInput("Which Flash Card (1): ",['1','2','3'],'1')
+             "let l:user_input = g:ConstrainedInput("Which Flash Card (1): ",['1','2','3'],'1')
+             let l:user_input = SelectFromFolder('~/.vim/bundle/vim-ide/flashcards')
              redraw!
-             call ShowFlashcardFile(l:user_input . '.fc')
+             call ShowFlashcardFile('flashcards/' . l:user_input . '')
 
          elseif (l:sz == s:cmdHistory)
              call g:ShowPopupList(s:my_history, 3500)
