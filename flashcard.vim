@@ -12,7 +12,7 @@ function! ShowFlashcardFile(filename) abort
     let l:pages = []
     let l:current_page = []
 
-    " Parse file into pages delimited by lines starting with "FLASHCARD"[cite: 1, 3]
+    " Parse file into pages delimited by lines starting with "FLASHCARD"
     for l:line in l:lines
         if l:line =~# '^FLASHCARD'
             if !empty(l:current_page)
@@ -20,7 +20,10 @@ function! ShowFlashcardFile(filename) abort
                 let l:current_page = []
             endif
         endif
-        call add(l:current_page, l:line)
+        " Dont include the line starting with "FLASHCARD"
+        if !(l:line =~# '^FLASHCARD')
+            call add(l:current_page, l:line)
+        endif
     endfor
     if !empty(l:current_page)
         call add(l:pages, l:current_page)
@@ -37,11 +40,11 @@ function! ShowFlashcardFile(filename) abort
         \ 'total': len(l:pages)
         \ }
 
-    " Calculate fixed size covering ~85% of available screen space[cite: 3]
+    " Calculate fixed size covering ~85% of available screen space
     let l:win_width  = float2nr(&columns * 0.85)
     let l:win_height = float2nr(&lines * 0.85)
 
-    " Configure fixed dimensions and lock min/max bounds[cite: 3]
+    " Configure fixed dimensions and lock min/max bounds
     let l:options = {
         \ 'pos': 'center',
         \ 'padding': [1, 3, 1, 3],
@@ -64,7 +67,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " s:FlashcardInteractiveFilter(winid, key)
-" Handles pagination, scrolling, buffer generation, and closing[cite: 3].
+" Handles pagination, scrolling, buffer generation, and closing.
 " ----------------------------------------------------------------------------
 function! s:FlashcardInteractiveFilter(winid, key) abort
     if a:key ==# "\<CursorHold>" || a:key ==# "\<CursorMoved>" || a:key ==# "\<Ignore>" || a:key ==# "\<MouseMove>"
@@ -81,7 +84,7 @@ function! s:FlashcardInteractiveFilter(winid, key) abort
     let l:idx = l:state.idx
     let l:total = l:state.total
 
-    " Page Forward (Next card): n, Space, f, Ctrl-f, Enter[cite: 3]
+    " Page Forward (Next card): n, Space, f, Ctrl-f, Enter
     if a:key ==# 'n' || a:key ==# "\<Space>" || a:key ==# 'f' || a:key ==# "\<C-f>" || a:key ==# "\<CR>"
         let l:state.idx = (l:idx + 1) % l:total
         call setwinvar(a:winid, 'fc_state', l:state)
@@ -89,7 +92,7 @@ function! s:FlashcardInteractiveFilter(winid, key) abort
         call popup_setoptions(a:winid, {'title': ' Flashcard ' . (l:state.idx + 1) . ' / ' . l:total . ' '})
         return 1
 
-    " Page Backward (Previous card): p, b, Ctrl-b[cite: 3]
+    " Page Backward (Previous card): p, b, Ctrl-b
     elseif a:key ==# 'p' || a:key ==# 'b' || a:key ==# "\<C-b>"
         let l:state.idx = (l:idx - 1 + l:total) % l:total
         call setwinvar(a:winid, 'fc_state', l:state)
@@ -97,12 +100,12 @@ function! s:FlashcardInteractiveFilter(winid, key) abort
         call popup_setoptions(a:winid, {'title': ' Flashcard ' . (l:state.idx + 1) . ' / ' . l:total . ' '})
         return 1
 
-    " Scroll Down within long card: j or Ctrl-e[cite: 3]
+    " Scroll Down within long card: j or Ctrl-e
     elseif a:key ==# 'j' || a:key ==# "\<C-e>"
         call win_execute(a:winid, "normal! \<C-e>")
         return 1
 
-    " Scroll Up within long card: k or Ctrl-y[cite: 3]
+    " Scroll Up within long card: k or Ctrl-y
     elseif a:key ==# 'k' || a:key ==# "\<C-y>"
         call win_execute(a:winid, "normal! \<C-y>")
         return 1
@@ -121,7 +124,7 @@ function! s:FlashcardInteractiveFilter(winid, key) abort
         echo "Opened Flashcard " . (l:idx + 1) . " in a new buffer."
         return 1
 
-    " Quit / Close: q or Esc[cite: 3]
+    " Quit / Close: q or Esc
     elseif a:key ==# 'q' || a:key ==# "\<Esc>"
         call popup_close(a:winid)
         return 1
