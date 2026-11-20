@@ -41,6 +41,9 @@ function! g:Switcher() abort
             if (g:AnyWindowsExist('menu'))
                 call g:JumpToWindowByName('menu')
                 nnoremap <buffer> f :call g:JumpToWindowByName('client')<bar>call ShowFlashcardFile("1.fc")<cr>
+                nnoremap <buffer> 1 :call g:JumpToWindowByName('client')<bar>execute "e " . g:my_filelist[0]<cr>
+                nnoremap <buffer> 2 :call g:JumpToWindowByName('client')<bar>execute "e " . g:my_filelist[1]<cr>
+                nnoremap <buffer> 3 :call g:JumpToWindowByName('client')<bar>execute "e " . g:my_filelist[2]<cr>
             endif
             if (g:AnyWindowsExist('dir'))
                 call g:JumpToWindowByName('dir')
@@ -68,7 +71,7 @@ function! g:FileListSwitcher() abort
     if (g:WindowExists('client'))
         call g:JumpToWindowByName('client')
         let g:fcursor = !g:fcursor
-        execute "e " . s:my_filelist[g:fcursor]
+        execute "e " . g:my_filelist[g:fcursor]
     endif
 endfunction
 
@@ -79,7 +82,7 @@ nnoremap <leader>d :call g:SwitcherDir()<cr>
 let s:nv_cache1 = {}
 let s:nv_cache2 = {}
 let s:my_history = []
-let s:my_filelist = []
+let g:my_filelist = []
 
 source ~/.vim/bundle/vim-ide/utils.vim
 
@@ -562,7 +565,7 @@ function! s:MyProject(...) abort
         let l:list = readfile("./projectfile")
         let g:ListCursor=-1
         call ListClear(s:my_history)
-        call ListClear(s:my_filelist)
+        call ListClear(g:my_filelist)
         call g:GetNext()
         let l:first_file = l:list[0]
         let s:listlength = len(l:list)
@@ -619,7 +622,7 @@ function! s:MyProject(...) abort
                  call StorePut(s:nv_cache2, key, key)
                  call g:JumpToWindowByName('client')
                  execute "e " .  s:DirSet . "/" . key
-                 call ListAppend(s:my_filelist, s:DirSet . "" . key)
+                 call ListAppend(g:my_filelist, s:DirSet . "" . key)
                  call g:JumpToWindowByName('menu')
         endfor
 
@@ -714,7 +717,7 @@ function! g:MySelectionAction(...) abort
          elseif (l:sz == s:cmdHistory)
              call g:ShowPopupList(s:my_history, 3500)
          elseif (l:sz == s:cmdFileList)
-             call g:ShowPopupList(s:my_filelist, 3500)
+             call g:ShowPopupList(g:my_filelist, 3500)
 
          elseif (l:sz == s:cmdStatus)
              let l:command = "git status"
