@@ -35,15 +35,31 @@ function! g:SwitcherDir() abort
     endif
 endfunction
 
+function! g:FastKey(...) abort
+    if (a:1 > len(g:my_filelist))
+        return
+    endif
+    call g:JumpToWindowByName('client')
+    execute "e " . g:my_filelist[a:1-1]
+    call g:JumpToWindowByName('menu')
+    execute a:1+1
+endfunction
+
 function! g:Switcher() abort
     if (g:AnyWindowsExist('menu','term','client','dir'))
         if (g:IsCurrentWindow('client'))
             if (g:AnyWindowsExist('menu'))
                 call g:JumpToWindowByName('menu')
                 nnoremap <buffer> f :call g:JumpToWindowByName('client')<bar>call ShowFlashcardFile("1.fc")<cr>
-                nnoremap <buffer> 1 :call g:JumpToWindowByName('client')<bar>execute "e " . g:my_filelist[0]<cr>
-                nnoremap <buffer> 2 :call g:JumpToWindowByName('client')<bar>execute "e " . g:my_filelist[1]<cr>
-                nnoremap <buffer> 3 :call g:JumpToWindowByName('client')<bar>execute "e " . g:my_filelist[2]<cr>
+                nnoremap <buffer> 1 :call g:FastKey(1)<cr>
+                nnoremap <buffer> 2 :call g:FastKey(2)<cr>
+                nnoremap <buffer> 3 :call g:FastKey(3)<cr>
+                nnoremap <buffer> 4 :call g:FastKey(4)<cr>
+                nnoremap <buffer> 5 :call g:FastKey(5)<cr>
+                nnoremap <buffer> 6 :call g:FastKey(6)<cr>
+                nnoremap <buffer> 7 :call g:FastKey(7)<cr>
+                nnoremap <buffer> 8 :call g:FastKey(8)<cr>
+                nnoremap <buffer> 9 :call g:FastKey(9)<cr>
             endif
             if (g:AnyWindowsExist('dir'))
                 call g:JumpToWindowByName('dir')
@@ -624,6 +640,7 @@ function! s:MyProject(...) abort
                  execute "e " .  s:DirSet . "/" . key
                  call ListAppend(g:my_filelist, s:DirSet . "" . key)
                  call g:JumpToWindowByName('menu')
+
         endfor
 
 
