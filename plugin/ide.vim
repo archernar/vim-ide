@@ -540,10 +540,6 @@ endfunction
 
 let g:ListCursor=-1
 
-function! g:GetThis()
-    return l:list[g:ListCursor]
-endfunction
-
 function! g:GetNext()
     let g:ListCursor = g:ListCursor + 1
     let l:list = readfile("./projectfile")

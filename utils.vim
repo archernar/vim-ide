@@ -406,57 +406,6 @@ endfunction
 " 3. Usage
 "call JumpToWindowByName('sidebar')
 "
-function! g:GetBufferFunctionList()
-    let lines = getline(1, '$')
-    let funcs = {}
-    
-    " Match function definitions: function foo, function! s:bar, def baz
-    let def_pattern = '^\s*\(function!\?\|def\)\s\+\([a-zA-Z0-9#_:]\+\)'
-    
-    for i in range(len(lines))
-        let match_res = matchlist(lines[i], def_pattern)
-        if !empty(match_res)
-            let func_name = match_res[2]
-            let funcs[func_name] = {
-                \ 'line': i + 1,
-                \ 'count': 0
-            }
-        endif
-    endfor
-
-    " Handle empty buffers gracefully so popup_create doesn't crash
-    if empty(funcs)
-        return {'Status': 'No functions found in this buffer'}
-    endif
-
-    " Count total references across all lines for each function using boundary matching
-    for name in keys(funcs)
-        let total_count = 0
-        let escaped_name = escape(name, '\^$.*[\~')
-        let pattern = '\v(^|[^a-zA-Z0-9#_:])@<=' . escaped_name . '([^a-zA-Z0-9#_:]|$)@='
-        
-        for line in lines
-            let idx = 0
-            while 1
-                let idx = match(line, pattern, idx)
-                if idx == -1
-                    break
-                endif
-                let total_count += 1
-                let idx += max([1, strlen(name)])
-            endwhile
-        endfor
-        let funcs[name].count = total_count
-    endfor
-
-    " Convert nested metadata into clean formatted strings for ShowPopupDict
-    let popup_dict = {}
-    for [name, info] in items(funcs)
-        let popup_dict[name] = printf("Line %d (Refs: %d)", info.line, info.count)
-    endfor
-
-    return popup_dict
-endfunction
 
 function! g:GetBufferFunctionList()
     let lines = getline(1, '$')
