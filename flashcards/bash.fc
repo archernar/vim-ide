@@ -1,0 +1,123 @@
+FLASHCARD 0
+0 Script Skeleton, Strict Mode & Traps
+
+Standard script header & strict mode:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IFS=$'\n\t'
+
+What strict flags do:
+    set -e          - exit immediately if a command exits non-zero
+    set -u          - treat unset variables as an error
+    set -o pipefail - pipeline fails if any command fails (not just the last)
+    IFS=$'\n\t'     - safer word splitting (avoids space surprises)
+
+Cleanup & signal traps:
+    trap 'rm -f "$tmpfile"' EXIT
+    trap 'echo "Interrupted"; exit 130' INT TERM
+
+FLASHCARD 1
+1 Variables, Quoting & Parameter Expansion
+
+Quoting rules:
+    "$var"          - always quote variables to prevent word splitting & globbing
+    '$var'          - literal string (no variable or command expansion)
+    $(cmd)          - command substitution (preferred over backticks `cmd`)
+
+Parameter expansion:
+    ${var:-default} - use 'default' if var is unset or empty
+    ${var:=default} - assign 'default' to var if unset or empty
+    ${var:?err msg} - exit with error message if var is unset/empty
+    ${#var}         - string length (or array element count for ${#arr[@]})
+    ${path##*/}     - basename (strip longest prefix up to last /)
+    ${path%/*}      - dirname (strip shortest suffix from last /)
+    ${str/old/new}  - replace first match; ${str//old/new} replaces all
+
+FLASHCARD 2
+2 Conditionals, Tests & Arithmetic
+
+Test expressions:
+    [[ -z "$s" ]]           - string is empty; [[ -n "$s" ]] is non-empty
+    [[ "$a" == "$b" ]]      - string equality (supports glob/pattern on RHS)
+    [[ "$a" =~ ^[0-9]+$ ]]  - regex match against BASH_REMATCH
+    [[ -f "$f" && -r "$f" ]] - regular file exists and is readable
+    [[ -d "$d" ]]           - directory exists
+    [[ "$n" -gt 10 ]]       - integer comparison (-eq, -ne, -lt, -le, -gt, -ge)
+
+Arithmetic evaluation:
+    (( count++ ))           - arithmetic context (no $ needed inside (( )) )
+    sum=$(( a + b * 2 ))    - arithmetic expansion producing a value
+
+FLASHCARD 3
+3 Loops, Functions & Positional Parameters
+
+Loops:
+    for item in "$@"; do ... done          - iterate cleanly over arguments
+    for f in *.log; do ... done            - globbing (nullglob avoids literal *.log)
+    while IFS= read -r line; do ... done < file  - safe line-by-line file reading
+    while true; do sleep 5; done           - poll/watch loop
+
+Functions & arguments:
+    my_func() { local x="$1"; return 0; }  - 'local' scopes variables to function
+    $# / $@ / $*                           - arg count / all args as separate words / single string
+
+FLASHCARD 4
+4 Arrays & Associative Arrays (Dictionaries)
+
+Indexed arrays:
+    arr=("one" "two" "three")
+    arr+=("four")                          - append element
+    echo "${arr[0]}"                       - first element
+    echo "${arr[@]}"                       - all elements (quoted properly)
+    echo "${#arr[@]}"                      - array length
+
+Associative arrays (Bash 4+):
+    declare -A map=( ["host"]="db1" ["port"]="5432" )
+    map["env"]="prod"
+    echo "${map[host]}"
+    echo "${!map[@]}"                      - all keys
+
+FLASHCARD 5
+5 Redirections, Pipelines & Process Substitution
+
+File descriptors & redirections:
+    cmd > out.log 2>&1     - redirect stdout and stderr to same file
+    cmd &> all.log         - Bash shorthand for stdout + stderr to file
+    cmd 2>/dev/null        - silence error messages
+    cmd <<'EOF'            - quoted heredoc (no variable expansion inside)
+
+Process substitution & grouping:
+    diff <(sort a.txt) <(sort b.txt)  - feed command outputs as files
+    { echo "Header"; cat body.txt; } > report.txt  - group commands in current shell
+    (cd /tmp && ls)        - run in subshell without changing caller's directory
+
+FLASHCARD 6
+6 Practical Bash One-Liners: Files & Text
+
+Batch rename extension (.jpeg -> .jpg):
+    for f in *.jpeg; do [[ -e "$f" ]] && mv -- "$f" "${f%.jpeg}.jpg"; done
+
+Find and delete empty files in current tree:
+    find . -type f -empty -delete
+
+Print line numbers with non-empty lines:
+    grep -n '[^[:space:]]' file.txt
+
+Extract unique sorted values from column 2 of a CSV/TSV:
+    awk -F',' 'NR>1 {print $2}' data.csv | sort -u
+
+FLASHCARD 7
+7 Practical Bash One-Liners: Safety, Loops & Quick Ops
+
+Backup a file with a timestamp:
+    cp -a config.yml "config.yml.$(date +%Y%m%d_%H%M%S).bak"
+
+Wait until a TCP port is listening:
+    until timeout 1 bash -c '</dev/tcp/127.0.0.1/8080' 2>/dev/null; do sleep 0.5; done
+
+Run a command across directories safely:
+    for d in */; do (cd "$d" && git status -s); done
+
+Dry-run / preview destructive rm with find:
+    find /tmp/old_logs -type f -mtime +14 -print
+

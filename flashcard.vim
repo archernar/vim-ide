@@ -132,4 +132,4 @@ function! s:FlashcardInteractiveFilter(winid, key) abort
 
     return 1
 endfunction
-
+command! -nargs=1 -complete=file Flashcard call ShowFlashcardFile(<f-args>)

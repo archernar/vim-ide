@@ -1,5 +1,6 @@
 plugin/ide.vim
 flashcard.vim
+flashcards/bash.fc
 1.fc
 2.fc
 olist.vim
