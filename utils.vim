@@ -277,7 +277,7 @@ endfunction
 command! CloseAllKeepWindow call CloseAllBuffersKeepWindow()
 
 
-function! CenterString(text, width, ...) abort
+function! g:CenterString(text, width, ...) abort
     " Use the provided padding character, or default to a space
     let l:pad_char = a:0 > 0 ? a:1 : ' '
     let l:text_len = strdisplaywidth(a:text)

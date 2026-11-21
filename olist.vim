@@ -92,7 +92,7 @@ endfunction
 
 function! ListDump(list) abort
     return deepcopy(a:list)
-endfunction`;
+endfunction
 " ============================================================================
 " USAGE EXAMPLES
 " ============================================================================

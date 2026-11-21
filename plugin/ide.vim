@@ -422,11 +422,6 @@ highlight ColorBlack   ctermfg=Black   guifg=#000000
 highlight ColorGray    ctermfg=Gray    guifg=#808080 cterm=NONE gui=NONE
 highlight MyCustomBg guibg=#00005f ctermbg=17 guifg=#ffffff ctermfg=255
 
-function! s:MakeCertainLinesWhite()
-    "call clearmatches()
-    "call matchadd('ColorWhite', '\%>0l\%<4l.*')
-    call matchadd('ColorWhite', '\%>0l\%<'.  (s:listlength+4) . 'l.*')
-endfunction
 function! s:MakeAllLinesWhite()
     call clearmatches()
     call matchadd('ColorWhite', '.*')
@@ -457,7 +452,7 @@ function! s:PutInBox(...) abort
         call s:PutLineColor(a:1, l:sz)
 
         let l:sz = g:BoxVert
-        let l:sz = l:sz . CenterString(a:2, winwidth(0)-4)
+        let l:sz = l:sz . g:CenterString(a:2, winwidth(0)-4)
         " let l:sz = l:sz . repeat( " ", winwidth(0)-4)
         let l:sz = l:sz . g:BoxVert
         call s:PutLineColor(a:1, l:sz)
@@ -693,7 +688,7 @@ endfunc
 
 function! g:MySelectionAction(...) abort
 
-     let l:sz   = s:DirToken(getline("."))
+     " let l:sz   = s:DirToken(getline("."))
      let l:sz   = getline(".")
      let l:szWORD = expand('<cWORD>')
      " **************************
