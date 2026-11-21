@@ -613,10 +613,10 @@ function! s:MyProject(...) abort
 
         call StoreClear(s:nv_cache2)
 
-        exe "wincmd w"
+        call g:JumpToWindowByName('client')
         execute "e " .  $HOME . "/" . "LUCIEN"
         call g:CloseBuffersExceptLucien() 
-        exe "wincmd w"
+        call g:JumpToWindowByName('menu')
 
         " Create an empty dictionary to store bufnr as key and filename as value
         let l:buffer_dict = {}
@@ -679,11 +679,11 @@ function! s:MyProject(...) abort
         if filereadable(s:DirSet . "/" . l:first_file)
             call HighlightLineWithStr('ColorGreen', l:first_file)
 			call g:JumpToLineWithStr(l:first_file)
-            exe "wincmd w"
+            call g:JumpToWindowByName('client')
             execute "e " .  s:DirSet . "/" . l:first_file
             call ListAppend(s:my_history, s:DirSet . "/" . l:first_file)
             if (s:BrowseMode == 1)
-                exe "wincmd w"
+                call g:JumpToWindowByName('client')
             endif
         endif
 
